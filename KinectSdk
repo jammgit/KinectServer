@@ -1,0 +1,13 @@
+
+NuiSetDeviceStatusCallback
+
+void CALLBACK    Nui_StatusProcThunk(HRESULT hrStatus, const OLECHAR* instanceName, const OLECHAR* uniqueDeviceName, void* pUserData);
+
+
+开始初始化
+NuiImpl.cpp Line166
+
+
+
+
+

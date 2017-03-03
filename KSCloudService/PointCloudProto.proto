@@ -1,0 +1,16 @@
+syntax="proto3";
+
+package PointCloudProto;
+
+message pbRespStart
+{
+int32 resultType = 1;
+string failReason = 2;
+int32 pcSvrPoint = 3;
+}
+
+message pbRespEnd
+{
+int32 resultType = 1;
+string failReason = 2;
+}

@@ -1,0 +1,12 @@
+syntax="proto3";
+
+package ConnectProto;
+
+message pbRespConnect
+{
+int32 resultType = 1;
+string failReason = 2;
+string deviceList = 3;
+string separator = 4;
+}
+
