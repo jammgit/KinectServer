@@ -69,12 +69,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;..\include\kinect;</IncludePath>
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;..\include\kinect;</IncludePath>
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -84,16 +84,17 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_MBCS;_WIN32_WINDOWS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\lib\boost\debug;</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>libprotobufd.lib</AdditionalDependencies>
+      <AdditionalDependencies>libprotobufd.lib;KSUtils.lib;IKSKinectDataCapture.lib;KSLogService.lib;KSKinectDataService.lib;boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_system-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\lib\protobuf\debug;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\protobuf\debug;..\lib\boost\debug;$(SolutionDir)$(Platform)\$(Configuration)\;</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,6 +115,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_MBCS;_WIN32_WINDOWS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -122,10 +124,10 @@
       <AdditionalLibraryDirectories>..\lib\boost\release;</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>libprotobuf.lib</AdditionalDependencies>
+      <AdditionalDependencies>libprotobuf.lib;KSKinectDataService.lib;KSLogService.lib;IKSKinectDataCapture.lib;KSUtils.lib;</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\lib\protobuf\release;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\protobuf\release;$(SolutionDir)$(Platform)\$(Configuration)\;</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

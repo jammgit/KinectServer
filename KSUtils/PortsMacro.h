@@ -1,0 +1,6 @@
+#pragma once
+
+#define PORT_KSSERVICE 7892
+#define PORT_COLORDATA 7893
+#define PORT_DEPTHDATA 7894
+#define PORT_SKELETONDATA 7895

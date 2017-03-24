@@ -4,12 +4,18 @@ FrameBuffer::FrameBuffer(unsigned int len)
 	: m_u32length(len)
 	, m_data(NULL)
 {
-	if (m_u32length > 0) m_data = new unsigned char[m_u32length] {0};
+	if ((m_u32length > MIN_LEN)
+		&& (m_u32length < MAX_LEN)) m_data = new unsigned char[m_u32length] {0};
+	else
+	{
+		m_u32length = 0;
+	}
 }
 
 FrameBuffer::~FrameBuffer()
 {
 	if (m_data) delete[] m_data;
+	m_data = NULL;
 }
 
 ShareFrame FrameBuffer::Make(int len)
@@ -17,15 +23,14 @@ ShareFrame FrameBuffer::Make(int len)
 	return boost::make_shared<FrameBuffer>(len);
 }
 
-ShareFrame FrameBuffer::Make(FrameBuffer frame)
+ShareFrame FrameBuffer::Make(const FrameBuffer& frame)
 {
 	ShareFrame sFrame = FrameBuffer::Make(frame.m_u32length);
-	sFrame->m_u32length = frame.m_u32length;
 	sFrame->m_u32Sequence = frame.m_u32Sequence;
 	sFrame->m_version = frame.m_version;
 	sFrame->m_cmdType = frame.m_cmdType;
 	sFrame->m_cmdNum = frame.m_cmdNum;
-	if (frame.m_u32length > 0)
+	if (sFrame->m_u32length > 0)
 		memcpy(sFrame->m_data, frame.m_data, frame.m_u32length);
 	return sFrame;
 }

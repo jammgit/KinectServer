@@ -10,7 +10,7 @@
 #pragma once
 
 #ifndef NUIAPI
-    #define NUIAPI __declspec( dllimport ) WINAPI
+#define NUIAPI __declspec( dllimport ) WINAPI
 #endif
 
 #include <pshpack8.h>
@@ -19,31 +19,29 @@
 extern "C" {
 #endif
 
-//
-// NUI Common Initialization Declarations
-//
+	//
+	// NUI Common Initialization Declarations
+	//
 
 #define NUI_INITIALIZE_FLAG_USES_AUDIO                  0x10000000
 #define NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX 0x00000001
 #define NUI_INITIALIZE_FLAG_USES_COLOR                  0x00000002
-#define NUI_INITIALIZE_FLAG_USES_SKELETON               0x00000008  
+#define NUI_INITIALIZE_FLAG_USES_SKELETON               0x00000008
 #define NUI_INITIALIZE_FLAG_USES_DEPTH                  0x00000020
 
 #define NUI_INITIALIZE_DEFAULT_HARDWARE_THREAD          0xFFFFFFFF
 
+	HRESULT NUIAPI NuiInitialize(
+		_In_ DWORD dwFlags
+		);
 
-HRESULT NUIAPI NuiInitialize(
-    _In_ DWORD dwFlags
-    );
+	VOID NUIAPI NuiShutdown(
+		);
 
-
-VOID NUIAPI NuiShutdown(
-    );
-
-//
-// Define NUI specific error codes
-// **** ALSO DEFINED IN NuiError.h.  Keep in sync! ****
-//
+	//
+	// Define NUI specific error codes
+	// **** ALSO DEFINED IN NuiError.h.  Keep in sync! ****
+	//
 
 #ifndef _NUI_HRESULTS
 #define _NUI_HRESULTS
@@ -57,11 +55,10 @@ VOID NUIAPI NuiShutdown(
 #define E_NUI_ALREADY_INITIALIZED   __HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED)
 #define E_NUI_NO_MORE_ITEMS         __HRESULT_FROM_WIN32(ERROR_NO_MORE_ITEMS)
 
-
 #define FACILITY_NUI 0x301
 #define S_NUI_INITIALIZING                      MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NUI, 1)                                             // 0x03010001
 #define E_NUI_FRAME_NO_DATA                     MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 1)
-static_assert(E_NUI_FRAME_NO_DATA == 0x83010001, "Error code has changed.");
+	static_assert(E_NUI_FRAME_NO_DATA == 0x83010001, "Error code has changed.");
 #define E_NUI_STREAM_NOT_ENABLED                MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 2)
 #define E_NUI_IMAGE_STREAM_IN_USE               MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 3)
 #define E_NUI_FRAME_LIMIT_EXCEEDED              MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 4)
@@ -73,7 +70,7 @@ static_assert(E_NUI_FRAME_NO_DATA == 0x83010001, "Error code has changed.");
 
 #define E_NUI_DATABASE_NOT_FOUND                MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 13)
 #define E_NUI_DATABASE_VERSION_MISMATCH         MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 14)
-// The requested feateure is not available on this version of the hardware
+	// The requested feateure is not available on this version of the hardware
 #define E_NUI_HARDWARE_FEATURE_UNAVAILABLE      MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, 15)                                              // 0x8301000F
 // The hub is no longer connected to the machine
 #define E_NUI_NOTCONNECTED                      MAKE_HRESULT(SEVERITY_ERROR, FACILITY_NUI, /* 20 */ ERROR_BAD_UNIT)                         // 0x83010014
@@ -91,7 +88,6 @@ static_assert(E_NUI_FRAME_NO_DATA == 0x83010001, "Error code has changed.");
 // assigned to the NUI Handles API subsystem of NUI. See NuiHandles.h for
 // details on those error codes.
 
-
 #ifdef __cplusplus
 } // end extern "C"
 #endif
@@ -103,4 +99,3 @@ static_assert(E_NUI_FRAME_NO_DATA == 0x83010001, "Error code has changed.");
 #include <NuiSkeleton.h>
 
 #include <poppack.h>
-

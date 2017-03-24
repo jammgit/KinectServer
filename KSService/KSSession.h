@@ -4,15 +4,15 @@
 #include "../KSUtils/ProtocProcess.h"
 #include "../KSUtils/AsyncTcpConnection.h"
 
-class IKSCloudService;
-class IKSSkeletonService;
+class IKSKinectDataService;
+class IKSService;
 
 class KSSession
 	: public IKSSession
 	, public AsyncTcpConnection
 {
 public:
-	KSSession(socket_ptr sock);
+	KSSession(IKSService* service, socket_ptr sock);
 	~KSSession();
 
 	void RegisterAllService() override;
@@ -22,10 +22,11 @@ public:
 protected:
 	void TryParse(const ShareData& data) override;
 	void DoFrame(const ShareFrame& frame) override;
+	void Release() override;
 
 private:
 	ProtocProcess m_protocProc;
 
-	IKSCloudService *m_pCloudService;
-	IKSSkeletonService *m_pSkeletonService;
+	IKSKinectDataService *m_pKDService;
+	IKSService *m_pService;
 };

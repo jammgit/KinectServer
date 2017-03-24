@@ -15,7 +15,7 @@ public:
 
 protected:
 	virtual void WorkingFunc() = 0;
-	bool m_bWorkingSwitch;
+	volatile bool m_bWorkingSwitch;
 
 private:
 	std::mutex m_tMutex;

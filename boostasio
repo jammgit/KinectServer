@@ -1,0 +1,4 @@
+
+1. service.run() 只是通知回调函数调用的一个函数。
+2. 异步方法的handler是在调用了io_service::run的线程里被调用的
+

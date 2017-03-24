@@ -18,7 +18,7 @@ public:
 	void SetUsed(unsigned int len);
 	unsigned int Used() const;
 
-private:
+public:
 	unsigned char *m_data;
 	unsigned int m_len;
 	unsigned int m_used;

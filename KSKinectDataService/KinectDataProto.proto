@@ -1,0 +1,21 @@
+syntax="proto3";
+
+package KinectDataProto;
+
+message pbReqStart
+{
+string deviceName = 1;
+int32 colorPort = 2;
+int32 depthPort = 3;
+int32 skelePort = 4;
+
+}
+
+message pbRespStart
+{
+int32 resultType = 1;
+string failReason = 2;
+int32 colorPort = 3;
+int32 depthPort = 4;
+int32 skelePort = 5;
+}

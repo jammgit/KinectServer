@@ -1,4 +1,9 @@
 <RCC>
-    <qresource prefix="KinectServer">
+    <qresource prefix="/KinectServer">
+        <file>Resources/bg_1.png</file>
+        <file>Resources/bg_2.png</file>
+        <file>Resources/bg_3.png</file>
+        <file>Resources/bg_4.png</file>
+        <file>Resources/close.png</file>
     </qresource>
 </RCC>
