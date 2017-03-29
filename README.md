@@ -18,16 +18,16 @@
 
 ## 模块简介
 
-	| 模块名       				 |  功能  |
-    | --------:  				 | :---- |
-    | IKSKinectDataCapture       | 负责捕获Kinect设备数据	|
-    | IKSKinectDataEncode        | 负责对Kinect数据进行变换与编码   |
-    | KSKinectDataServer         | Kinect数据服务器    |
-	| KSKinectService        	 | KinectServer控制指令服务器    |
-	| KSKinectDataService        | 解析Kinect数据请求    |
-	| KSLogService        		 | 日志打印    |
-	| KSUtils        			 | 工具集   |
-	| KinectServer        		 | Qt主工程  |
+| 模块名       				 |  功能  |
+| --------:  				 | :---- |
+| IKSKinectDataCapture       | 负责捕获Kinect设备数据	|
+| IKSKinectDataEncode        | 负责对Kinect数据进行变换与编码   |
+| KSKinectDataServer         | Kinect数据服务器    |
+| KSKinectService        	 | KinectServer控制指令服务器    |
+| KSKinectDataService        | 解析Kinect数据请求    |
+| KSLogService        		 | 日志打印    |
+| KSUtils        			 | 工具集   |
+| KinectServer        		 | Qt主工程  |
 
 
 ## 联系作者
