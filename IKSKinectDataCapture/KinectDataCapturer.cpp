@@ -83,7 +83,7 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 			std::wstring w(instanceName);
 			std::string a;
 			CharsetUtils::UnicodeStringToANSIString(w, a);
-			KSLogService::GetInstance()->OutputDevice(a.c_str(), true);
+			KSLogService::GetInstance()->OutputDevice(a, true);
 		}
 	}
 	else
@@ -117,7 +117,7 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 		std::wstring w(instanceName);
 		std::string a;
 		CharsetUtils::UnicodeStringToANSIString(w, a);
-		KSLogService::GetInstance()->OutputDevice(a.c_str(), false);
+		KSLogService::GetInstance()->OutputDevice(a, false);
 	}
 }
 

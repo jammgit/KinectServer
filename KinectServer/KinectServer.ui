@@ -23,14 +23,14 @@ border-image: url(:/KinectServer/Resources/bg_4.png);
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>18</x>
-      <y>16</y>
-      <width>842</width>
+      <x>17</x>
+      <y>15</y>
+      <width>843</width>
       <height>382</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(0, 0, 0);</string>
+     <string notr="true"/>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -69,8 +69,7 @@ border-image: url(:/KinectServer/Resources/bg_4.png);
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);
-border:0px;</string>
+        <string notr="true"/>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -80,7 +79,7 @@ border:0px;</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="leftMargin">
          <number>0</number>
@@ -103,38 +102,14 @@ border:0px;</string>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QListWidget#listWidget
-{
-background-color: rgb(0, 0, 0);
-
-border-right:1px solid #ffffff;
-border-left:0px;
-border-top:0px;
-border-bottom:0px;
-}
-QListWidget#listWidget::item
-{
-color: rgb(255, 255, 255);
-}</string>
+           <string notr="true"/>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QListWidget" name="listWidget_2">
           <property name="styleSheet">
-           <string notr="true">QListWidget#listWidget_2
-{
-background-color: rgb(0, 0, 0);
-
-border-right:1px solid #ffffff;
-border-left:0px;
-border-top:0px;
-border-bottom:0px;
-}
-QListWidget#listWidget_2::item
-{
-color: rgb(255, 255, 255);
-}</string>
+           <string notr="true"/>
           </property>
          </widget>
         </item>
@@ -146,6 +121,12 @@ color: rgb(255, 255, 255);
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>378</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>华文细黑</family>
@@ -153,12 +134,7 @@ color: rgb(255, 255, 255);
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">QTextEdit#textEdit
-{
-border:1px solid #000000;
-background-color: rgb(0, 0, 0, 255);
-	color: rgb(255, 255, 255);
-}</string>
+        <string notr="true">border:1px solid #eeeeee;</string>
        </property>
        <property name="readOnly">
         <bool>true</bool>

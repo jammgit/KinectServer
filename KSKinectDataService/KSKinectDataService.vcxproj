@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;..\include\kinect;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;..\include\kinect</IncludePath>
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -146,16 +146,10 @@
     <ClInclude Include="IKSKinectDataClient.h" />
     <ClInclude Include="IKSKinectDataService.h" />
     <ClInclude Include="KinectDataProto.pb.h" />
-    <ClInclude Include="KSKinectDataEncoder.h" />
-    <ClInclude Include="KSKinectDataSender.h" />
-    <ClInclude Include="KSKinectDataServer.h" />
     <ClInclude Include="KSKinectDataService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KinectDataProto.pb.cc" />
-    <ClCompile Include="KSKinectDataEncoder.cpp" />
-    <ClCompile Include="KSKinectDataSender.cpp" />
-    <ClCompile Include="KSKinectDataServer.cpp" />
     <ClCompile Include="KSKinectDataService.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

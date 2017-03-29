@@ -2,7 +2,7 @@
 #include "../IKSKinectDataCapture/KinectDataCapturer.h"
 #include "../KSLogService/KSLogService.h"
 #include "../KSUtils/PortsMacro.h"
-#include "../KSKinectDataService/KSKinectDataServer.h"
+#include "../KSKinectDataServer/KSKinectDataServer.h"
 
 KSService::KSService()
 	: AsyncTcpServer(PORT_KSSERVICE)

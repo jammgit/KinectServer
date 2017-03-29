@@ -29,11 +29,13 @@ protected:
 
 signals:
 	void OutputString(const char* msg) override;
-	void OutputDevice(const char* dev, bool connect) override;
+	void OutputString(const std::string& msg) override;
+	void OutputDevice(const std::string& dev, bool connect) override;
 	void OutputClient(const std::string& addr, bool connect) override;
 	public slots:
 	void slot_OutputString(const char* msg);
-	void slot_OutputDevice(const char* dev, bool connect);
+	void slot_OutputString(const std::string& msg);
+	void slot_OutputDevice(const std::string& dev, bool connect);
 	void slot_OutputClient(const std::string& addr, bool connect);
 
 	private slots:

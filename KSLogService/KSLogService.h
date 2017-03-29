@@ -14,7 +14,8 @@ public:
 	void RegisterClient(IKSLogClient* client);
 
 	void OutputMessage(const char* msg);
-	void OutputDevice(const char*, bool);
+	void OutputMessage(const std::string& msg);
+	void OutputDevice(const std::string& dev, bool);
 	void OutputClient(const std::string& name, bool);
 
 private:

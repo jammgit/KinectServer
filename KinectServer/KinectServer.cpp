@@ -72,7 +72,8 @@ void KinectServer::InitWidget()
 void KinectServer::InitConnect()
 {
 	QObject::connect(this, SIGNAL(OutputString(const char*)), this, SLOT(slot_OutputString(const char*)));
-	QObject::connect(this, SIGNAL(OutputDevice(const char*, bool)), this, SLOT(slot_OutputDevice(const char*, bool)));
+	QObject::connect(this, SIGNAL(OutputString(const std::string&)), this, SLOT(slot_OutputString(const std::string&)));
+	QObject::connect(this, SIGNAL(OutputDevice(const std::string&, bool)), this, SLOT(slot_OutputDevice(const std::string&, bool)));
 	QObject::connect(this, SIGNAL(OutputClient(const std::string&, bool)), this, SLOT(slot_OutputClient(const std::string&, bool)));
 }
 
@@ -86,20 +87,26 @@ void KinectServer::slot_OutputString(const char* msg)
 	ui.textEdit->moveCursor(QTextCursor::End);
 }
 
-void KinectServer::slot_OutputDevice(const char* dev, bool connect)
+void KinectServer::slot_OutputString(const std::string& msg)
+{
+	this->slot_OutputString(msg.c_str());
+}
+
+void KinectServer::slot_OutputDevice(const std::string& dev, bool connect)
 {
 	if (connect)
 	{
-		ui.listWidget->addItem(QString::fromLocal8Bit(dev));
+		ui.listWidget->addItem(QString::fromStdString(dev));
 	}
 	else
 	{
 		for (int i = 0; i < ui.listWidget->count(); ++i)
 		{
 			QListWidgetItem * item = ui.listWidget->item(i);
-			if (item->text().compare(QString::fromLocal8Bit(dev)) == 0)
+			if (item->text().compare(QString::fromStdString(dev)) == 0)
 			{
 				ui.listWidget->removeItemWidget(item);
+				delete item;
 				break;
 			}
 		}

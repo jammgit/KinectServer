@@ -21,7 +21,13 @@ void KSLogService::OutputMessage(const char* msg)
 		m_pConsoleClient->OutputString(msg);
 }
 
-void KSLogService::OutputDevice(const char*dev, bool connect)
+void KSLogService::OutputMessage(const std::string& msg)
+{
+	if (m_pConsoleClient)
+		m_pConsoleClient->OutputString(msg);
+}
+
+void KSLogService::OutputDevice(const std::string& dev, bool connect)
 {
 	if (m_pConsoleClient)
 		m_pConsoleClient->OutputDevice(dev, connect);

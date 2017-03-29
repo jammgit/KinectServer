@@ -7,7 +7,7 @@
 #include "../KSUtils/CharsetUtils.h"
 #include "../KSUtils/PortsMacro.h"
 #include "../KSService/IKSService.h"
-#include "KSKinectDataServer.h"
+#include "../KSKinectDataServer/KSKinectDataServer.h"
 
 KSKinectDataService::KSKinectDataService(IKSService* service, KSSession *session)
 	: m_pSession(session)

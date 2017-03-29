@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E025252D-A5F3-412C-A9BB-FC9F0B41EA5A}</ProjectGuid>
-    <RootNamespace>KSService</RootNamespace>
+    <ProjectGuid>{33191C9A-FAE1-4236-A8DA-208B452B7C66}</ProjectGuid>
+    <RootNamespace>KSKinectDataServer</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -68,12 +68,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;..\include\kinect;</IncludePath>
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\include;..\include\protobuf;..\include\kinect;</IncludePath>
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -83,18 +83,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_MBCS;_WIN32_WINDOWS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_WIN32_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\lib\boost\debug;</AdditionalLibraryDirectories>
-    </Link>
     <Lib>
-      <AdditionalDependencies>libprotobufd.lib;KSUtils.lib;IKSKinectDataCapture.lib;KSLogService.lib;KSKinectDataService.lib;KSKinectDataServer.lib;boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_system-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib</AdditionalDependencies>
-    </Lib>
-    <Lib>
-      <AdditionalLibraryDirectories>..\lib\protobuf\debug;..\lib\boost\debug;$(SolutionDir)$(Platform)\$(Configuration)\;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;../lib/libyuv/;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>KSUtils.lib;KSLogService.lib;IKSKinectH264Encode.lib;yuv.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -103,9 +96,6 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -114,20 +104,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_MBCS;_WIN32_WINDOWS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_WIN32_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\lib\boost\release;</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>libprotobuf.lib;KSKinectDataService.lib;KSLogService.lib;IKSKinectDataCapture.lib;KSUtils.lib;KSKinectDataServer.lib</AdditionalDependencies>
-    </Lib>
-    <Lib>
-      <AdditionalLibraryDirectories>..\lib\protobuf\release;$(SolutionDir)$(Platform)\$(Configuration)\;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;../lib/libyuv/;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>KSUtils.lib;KSLogService.lib;IKSKinectH264Encode.lib;yuv.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,23 +124,19 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ConnectProto.pb.h" />
-    <ClInclude Include="IKSClient.h" />
-    <ClInclude Include="IKSService.h" />
-    <ClInclude Include="IKSSession.h" />
-    <ClInclude Include="KSService.h" />
-    <ClInclude Include="KSSession.h" />
+    <ClCompile Include="KSKinectDataEncoder.cpp" />
+    <ClCompile Include="KSKinectDataSender.cpp" />
+    <ClCompile Include="KSKinectDataServer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConnectProto.pb.cc" />
-    <ClCompile Include="KSService.cpp" />
-    <ClCompile Include="KSSession.cpp" />
+    <ClInclude Include="KSKinectDataEncoder.h" />
+    <ClInclude Include="KSKinectDataSender.h" />
+    <ClInclude Include="KSKinectDataServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
