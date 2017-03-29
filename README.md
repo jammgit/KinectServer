@@ -33,7 +33,7 @@
 ## 联系作者
 * QQ:269337654
 * Email:269337654@qq.com
-* Blog : [依然那霖哥](http://blog.csdn.net/jammg “依然那霖哥”)
+* Blog : [依然那霖哥](http://blog.csdn.net/jammg "依然那霖哥")
 
 
 ## 客户端Git
