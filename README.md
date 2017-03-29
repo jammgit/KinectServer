@@ -19,7 +19,7 @@
 ## 模块简介
 
 | 模块名       				 |  功能  |
-| --------:  				 | :---- |
+| :--------  				 | :---- |
 | IKSKinectDataCapture       | 负责捕获Kinect设备数据	|
 | IKSKinectDataEncode        | 负责对Kinect数据进行变换与编码   |
 | KSKinectDataServer         | Kinect数据服务器    |
