@@ -1,0 +1,11 @@
+syntax="proto3";
+
+package DataChannelProto;
+
+// 由传输信道发送到服务器上的数据传输socket
+// 服务器对此guid验证,进行端口对应匹配记录
+message pbDataChannelPkg
+{
+    string deviceName = 1;
+    string guid = 2;
+}

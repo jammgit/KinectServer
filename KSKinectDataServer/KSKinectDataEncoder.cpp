@@ -13,12 +13,12 @@
 #include <stdio.h>
 
 KSKinectDataEncoder::KSKinectDataEncoder(
-	AsyncTcpConnectionPtr sender,
+	KSKinectDataSenderPtr sender,
 	KSKinectDataEncoder::eSrcType type,
 	const std::string& devicename)
 	: m_SrcType(type)
 	, m_deviceName(devicename)
-	, m_pSender(sender)
+	, m_Sender(sender)
 	, m_pEncoder(NULL)
 {
 	m_lastH = 0;
@@ -96,7 +96,7 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 
 	while (queueptr && m_bWorkingSwitch)
 	{
-		if (m_pSender->GetDataQueueSize() >= MAX_QUEUE_SIZE)
+		if (m_Sender->GetDataQueueSize() >= MAX_QUEUE_SIZE)
 		{
 			Sleep(25);
 			continue;
@@ -147,11 +147,8 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 					out_linesize[i],
 					out_data[i]);
 
-				if (m_pSender)
-				{
-					static_cast<KSKinectDataSender*>(m_pSender.get())
-						->Send264Frame(encodedFrame);
-				}
+				m_Sender->Send264Frame(encodedFrame);
+
 			}
 		}
 	}
@@ -176,11 +173,7 @@ bool KSKinectDataEncoder::EncodeSkeleton()
 			if (b) return false; //kinect ¶Ï¿ª
 		}
 
-		if (m_pSender)
-		{
-			static_cast<KSKinectDataSender*>(m_pSender.get())
-				->SendSkeletonFrame(frame);
-		}
+		m_Sender->SendSkeletonFrame(frame);
 	}
 	return true;
 }

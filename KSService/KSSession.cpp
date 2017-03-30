@@ -1,5 +1,5 @@
 #include "KSSession.h"
-#include "KSService.h"
+#include "IKSService.h"
 #include "ConnectProto.pb.h"
 #include <vector>
 #include <string>
@@ -14,7 +14,7 @@ KSSession::KSSession(IKSServicePtr service, socket_ptr sock, std::string guid)
 	: m_StrGuid(guid)
 	, m_KDService(NULL)
 	, m_Service(service)
-	, AsyncTcpConnection(sock)
+	, IKSSession(sock)
 {
 }
 
@@ -168,8 +168,6 @@ void KSSession::Release()
 	this->ReleaseDataServerSource();
 
 	AsyncTcpConnection::Release();
-
-	//if (m_KDService) { delete m_pKDService; m_pKDService = NULL; }
 
 	if (m_Service)
 		m_Service->ReleaseSession(m_StrGuid);

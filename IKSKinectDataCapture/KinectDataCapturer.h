@@ -54,25 +54,4 @@ private:
 	DeviceNameList			m_DevNameList;
 
 	std::mutex m_callBackMutex;
-	// Current kinect
-	//INuiSensor *            m_pNuiSensor;
-	//BSTR                    m_instanceId;
-
-	//// 线程句柄
-	//HANDLE m_hThNuiProcess;
-
-	//// 线程通知事件
-	//HANDLE m_hEvNuiProcessStop;
-	//HANDLE m_hNextColorFrameEvent;
-	//HANDLE m_hNextDepthFrameEvent;
-	//HANDLE m_hNextSkeletonEvent;
-
-	//HANDLE m_pVideoStreamHandle;
-	//HANDLE m_pDepthStreamHandle;
-
-	//RGBQUAD m_rgbWk[640 * 480];
-
-	//bool m_bScreenBlanked;
-	//bool m_bAppTracking;
-	//DWORD m_SkeletonIds[NUI_SKELETON_COUNT];
 };

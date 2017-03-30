@@ -24,13 +24,7 @@
     <ClCompile Include="Thread.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="AsyncTcpServer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="ProtocProcess.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="AsyncTcpConnection.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SocketAddress.cpp">

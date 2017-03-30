@@ -1,0 +1,22 @@
+syntax="proto3";
+
+package ConnectProto;
+
+// 服务器对客户端的请求连接进行回应
+message pbRespConnect
+{
+    int32 resultType = 1;
+    string failReason = 2;
+    string guid = 3;
+    int32 colorPort = 4;
+    int32 depthPort = 5;
+    int32 skelePort = 6;
+}
+
+// 服务器对客户端的请求设备列表进行回应
+// 并返回设备列表
+message pbRespDevices
+{
+    string deviceList = 1;
+    string separator = 2;
+}

@@ -1,6 +1,6 @@
 #include "KSKinectDataService.h"
 #include "KinectDataProto.pb.h"
-#include "../KSService/KSSession.h"
+#include "../KSService/IKSSession.h"
 #include "../KSLogService/KSLogService.h"
 #include "../KSUtils/ShareFrame.h"
 #include "../IKSKinectDataCapture/KinectDataCapturer.h"
@@ -94,12 +94,6 @@ void KSKinectDataService::ProcessEndReq(const ShareFrame& frame)
 	m_Session->StrGuid();
 	
 
-	//Addresses addrs;
-	//if (KSKinectDataServer::ResetDataAddrByCmdAddr(
-	//	m_pSession->GetAddrPort(), addrs))
-	//{
-	//	KSKinectDataServer::CloseSenders(addrs);
-	//}
 }
 
 void KSKinectDataService::SendEnd(eSvrEndType type, const std::string& devname)

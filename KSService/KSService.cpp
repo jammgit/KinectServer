@@ -6,7 +6,7 @@
 #include "../KSKinectDataServer/KSKinectDataServer.h"
 
 KSService::KSService()
-	: AsyncTcpServer(PORT_KSSERVICE)
+	: IKSService(PORT_KSSERVICE)//AsyncTcpServer<KSService>(PORT_KSSERVICE)
 	, m_ColorServerPtr(NULL)
 	, m_DepthServerPtr(NULL)
 	, m_SkeletonServerPtr(NULL)
@@ -91,6 +91,3 @@ KSKinectDataServerPtr KSService::GetSkeleServerPtr()
 	return m_SkeletonServerPtr;
 }
 
-void KSService::Release()
-{
-}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../KSUtils/AsyncTcpServer.h"
+
 #include "../KSUtils/Thread.h"
 #include "../KSUtils/Singleton.h"
 #include "IKSService.h"
@@ -16,13 +16,12 @@ typedef std::list<KSSessionPtr> KSSessionPtrList;
 class KSService;
 typedef boost::shared_ptr<KSService> KSServicePtr;
 
-
 using StrGUID = std::string;
 typedef std::map<StrGUID, KSSessionPtr> KSSessionMap;
 
 class KSService
 	: public IKSService
-	, public AsyncTcpServer
+	//, public AsyncTcpServer<KSService>
 	, public Thread
 	, public Singleton<KSService>
 {
@@ -37,16 +36,14 @@ public:
 	void ReleaseSession(const std::string& guid) override;
 	void Stop() override;
 
-protected:
+//protected:
 	void CreateConnection(socket_ptr sock) override;
 
 protected:
 	void WorkingFunc() override;
-	void Release();
+
 
 private:
-	//std::mutex m_listMutex;
-	//KSSessionPtrList m_sessionList;
 
 	std::mutex m_MapMutex;
 	KSSessionMap m_SessionMap;

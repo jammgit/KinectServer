@@ -143,8 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AsyncTcpConnection.cpp" />
-    <ClCompile Include="AsyncTcpServer.cpp" />
     <ClCompile Include="GuidProcessUtil.cpp" />
     <ClCompile Include="ProtocProcess.cpp" />
     <ClCompile Include="ShareData.cpp" />

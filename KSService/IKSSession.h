@@ -1,11 +1,13 @@
 #pragma once
 
 #include "../KSUtils/ShareFrame.h"
+#include "../KSUtils/AsyncTcpConnection.h"
 
 class IKSKinectDataService;
 typedef boost::shared_ptr<IKSKinectDataService> IKSKinectDataServicePtr;
 
 class IKSSession
+	: public AsyncTcpConnection<IKSSession>
 {
 public:
 	enum
@@ -30,6 +32,8 @@ public:
 	};
 
 public:
+	IKSSession(socket_ptr sock)
+		: AsyncTcpConnection<IKSSession>(sock) {};
 	virtual ~IKSSession() {};
 
 	virtual void RegisterAllService() = 0;

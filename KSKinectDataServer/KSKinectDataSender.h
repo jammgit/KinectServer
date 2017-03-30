@@ -17,14 +17,14 @@ typedef boost::shared_ptr<KSKinectDataEncoder> KSKinectDataEncoderPtr;
 class KSKinectDataServer;
 typedef boost::shared_ptr<KSKinectDataServer> KSKinectDataServerPtr;
 
-class AsyncTcpServer;
-typedef boost::shared_ptr<AsyncTcpServer> AsyncTcpServerPtr;
+//class AsyncTcpServer;
+//typedef boost::shared_ptr<AsyncTcpServer> AsyncTcpServerPtr;
 
 class KSKinectDataSender;
 typedef boost::shared_ptr<KSKinectDataSender> KSKinectDataSenderPtr;
 
 class KSKinectDataSender
-	: public AsyncTcpConnection
+	: public AsyncTcpConnection<KSKinectDataSender>
 {
 	typedef enum
 	{
@@ -36,7 +36,7 @@ class KSKinectDataSender
 	}eCmdNum;
 public:
 	KSKinectDataSender(
-		AsyncTcpServerPtr server,
+		KSKinectDataServerPtr server,
 		socket_ptr sock,
 		KSKinectDataEncoder::eSrcType type);
 	~KSKinectDataSender();
@@ -47,7 +47,7 @@ public:
 
 	void Close();
 
-protected:
+//protected:
 	void TryParse(const ShareData& data) override;
 	void SendShareFrame(ShareFrame frame) {};
 	void Release() override;
@@ -55,7 +55,7 @@ protected:
 	inline void EndProcess();
 
 private:
-	AsyncTcpServerPtr m_pServer;
+	KSKinectDataServerPtr m_pServer;
 
 	ProtocProcess m_ProtoProcess;
 

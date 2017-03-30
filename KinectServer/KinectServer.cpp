@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QApplication>
 
 KinectServer::KinectServer(QWidget *parent)
 	: QMainWindow(parent)

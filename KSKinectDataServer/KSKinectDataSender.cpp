@@ -2,14 +2,14 @@
 #include "KSKinectDataServer.h"
 #include "DataChannelProto.pb.h"
 #include "../KSUtils/ShareData.h"
-#include "../KSService/KSSession.h"
+#include "../KSService/IKSSession.h"
 #include "../KSKinectDataService/IKSKinectDataService.h"
 
 KSKinectDataSender::KSKinectDataSender(
-	AsyncTcpServerPtr server,
+	KSKinectDataServerPtr server,
 	socket_ptr sock,
 	KSKinectDataEncoder::eSrcType type)
-	: AsyncTcpConnection(sock)
+	: AsyncTcpConnection<KSKinectDataSender>(sock)
 	, m_EncoderPtr(NULL)
 	, m_type(type)
 	, m_pServer(server)
@@ -123,13 +123,11 @@ void KSKinectDataSender::DeviceUnlink()
 		if (m_pServer
 			&& (server = static_cast<KSKinectDataServer*>(m_pServer.get())))
 		{
-			AsyncTcpConnectionPtr cmdSock;
-			KSSession *session;
+			IKSSessionPtr cmdSock;
 			if (server->GetCmdSock(m_StrGuid, cmdSock))
 			{
-				session = static_cast<KSSession*>(cmdSock.get());
 				IKSKinectDataServicePtr kdService
-					= session->KinectDataService();
+					= cmdSock->KinectDataService();
 				if (kdService)
 					kdService->SendEnd(
 						IKSKinectDataService::ERR_DEVICE,
@@ -154,13 +152,11 @@ void KSKinectDataSender::Release()
 		if (m_pServer
 			&& (server = static_cast<KSKinectDataServer*>(m_pServer.get())))
 		{
-			AsyncTcpConnectionPtr cmdSock;
-			KSSession *session;
+			IKSSessionPtr cmdSock;
 			if (server->GetCmdSock(m_StrGuid, cmdSock))
 			{
-				session = static_cast<KSSession*>(cmdSock.get());
 				IKSKinectDataServicePtr kdService
-					= session->KinectDataService();
+					= cmdSock->KinectDataService();
 				if (kdService)
 					kdService->SendEnd(
 						IKSKinectDataService::ERR_SOCKET,

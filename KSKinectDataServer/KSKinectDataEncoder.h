@@ -6,8 +6,11 @@
 #include <boost\shared_ptr.hpp>
 #include <mutex>
 
-class AsyncTcpConnection;
-typedef boost::shared_ptr<AsyncTcpConnection> AsyncTcpConnectionPtr;
+//class AsyncTcpConnection;
+//typedef boost::shared_ptr<AsyncTcpConnection> AsyncTcpConnectionPtr;
+
+class KSKinectDataSender;
+typedef boost::shared_ptr<KSKinectDataSender> KSKinectDataSenderPtr;
 
 class KSKinectDataEncoder;
 typedef boost::shared_ptr<KSKinectDataEncoder> KSKinectDataEncoderPtr;
@@ -26,7 +29,7 @@ public:
 	}eSrcType;
 public:
 	KSKinectDataEncoder(
-		AsyncTcpConnectionPtr sender,
+		KSKinectDataSenderPtr sender,
 		KSKinectDataEncoder::eSrcType type,
 		const std::string& devicename);
 	~KSKinectDataEncoder();
@@ -46,7 +49,7 @@ private:
 	std::string m_deviceName;
 
 	KinectDataCaptureQueuePtr m_DataQueuePtr;
-	AsyncTcpConnectionPtr m_pSender;
+	KSKinectDataSenderPtr m_Sender;
 
 	std::mutex m_EncodeMutex;
 	Openh264Encoder* m_pEncoder;

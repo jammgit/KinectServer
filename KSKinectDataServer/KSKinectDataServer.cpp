@@ -14,7 +14,7 @@ std::map<unsigned short, KSKinectDataEncoder::eSrcType>
 
 
 KSKinectDataServer::KSKinectDataServer(unsigned short port)
-	: AsyncTcpServer(port)
+	: AsyncTcpServer<KSKinectDataServer>(port)
 {
 }
 
@@ -36,7 +36,7 @@ void KSKinectDataServer::Stop()
 
 bool KSKinectDataServer::RegisterCmdSock(
 	const StrGUID& guid,
-	AsyncTcpConnectionPtr conn)
+	IKSSessionPtr conn)
 {
 	std::lock_guard<std::mutex> lock(m_MapMutex);
 	m_Guid2CmdSockMap[guid] = conn;
@@ -45,7 +45,7 @@ bool KSKinectDataServer::RegisterCmdSock(
 
 bool KSKinectDataServer::GetCmdSock(
 	const StrGUID& guid,
-	AsyncTcpConnectionPtr& conn)
+	IKSSessionPtr& conn)
 {
 	std::lock_guard<std::mutex> lock(m_MapMutex);
 	auto iter = m_Guid2CmdSockMap.find(guid);
@@ -60,7 +60,7 @@ bool KSKinectDataServer::GetCmdSock(
 bool KSKinectDataServer::RegisterDataSock(
 	const StrGUID& guid,
 	const std::string& devname,
-	AsyncTcpConnectionPtr conn)
+	KSKinectDataSenderPtr conn)
 {
 	std::lock_guard<std::mutex> lock(m_MapMutex);
 	m_Guid2DataSockMap[guid][devname] = conn;
@@ -92,23 +92,6 @@ bool KSKinectDataServer::UnRegisterAllSock(
 	}
 	return true;
 }
-
-
-//void KSKinectDataServer::ReleaseSender(AsyncTcpConnectionPtr sender)
-//{
-//	std::lock_guard<std::mutex> lock(m_SenderListMutex);
-//	auto iter = m_SenderPtrList.begin();
-//	while (iter != m_SenderPtrList.end())
-//	{
-//		if (*iter == sender)
-//		{
-//			m_SenderPtrList.erase(iter);
-//			break;
-//		}
-//		++iter;
-//	}
-//}
-
 
 
 void KSKinectDataServer::CreateConnection(socket_ptr sock)

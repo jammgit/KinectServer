@@ -2,7 +2,7 @@
 
 #include "IKSSession.h"
 #include "../KSUtils/ProtocProcess.h"
-#include "../KSUtils/AsyncTcpConnection.h"
+
 #include <string>
 
 class IKSKinectDataService;
@@ -12,7 +12,6 @@ typedef boost::shared_ptr<IKSService> IKSServicePtr;
 
 class KSSession
 	: public IKSSession
-	, public AsyncTcpConnection
 {
 public:
 	KSSession(IKSServicePtr service, socket_ptr sock, std::string guid);
@@ -24,7 +23,7 @@ public:
 
 	void SendShareFrame(ShareFrame frame) override;
 
-protected:
+//protected:
 	void TryParse(const ShareData& data) override;
 	void DoFrame(const ShareFrame& frame) override;
 	void Release() override;
