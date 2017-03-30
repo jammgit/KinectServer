@@ -2,6 +2,7 @@
 #include "../IKSKinectDataCapture/KinectDataCapturer.h"
 #include "../KSLogService/KSLogService.h"
 #include "../KSUtils/PortsMacro.h"
+#include "../KSUtils/GuidProcessUtil.h"
 #include "../KSKinectDataServer/KSKinectDataServer.h"
 
 KSService::KSService()
@@ -32,23 +33,25 @@ void KSService::Stop()
 
 	Thread::Stop();
 
-	std::lock_guard<std::mutex> lock(m_listMutex);
-	m_sessionList.clear();
+	std::lock_guard<std::mutex> lock(m_MapMutex);
+	m_SessionMap.clear();
 }
 
 void KSService::CreateConnection(socket_ptr sock)
 {
-	KSSessionPtr session = boost::make_shared<KSSession>(this, sock);
+	std::string guid = GuidProcessUtil::CreateStrGuid();
+	KSSessionPtr session = boost::make_shared<KSSession>(
+		shared_from_this(), sock, guid);
 	ShareFrame frame;
-	if (m_sessionList.size() < 65535)
+	if (m_SessionMap.size() < 65535)
 	{
 		session->RegisterAllService();
 		session->DoRead();
-		std::lock_guard<std::mutex> lock(m_listMutex);
-		m_sessionList.push_back(session);
+		
+		std::lock_guard<std::mutex> lock(m_MapMutex);
+		m_SessionMap[guid] = session;
 
 		KSLogService::GetInstance()->OutputMessage("Create Connection\n");
-
 		KSLogService::GetInstance()->OutputClient(
 			session->GetAddrStr().c_str(), true);
 		return;
@@ -59,40 +62,33 @@ void KSService::CreateConnection(socket_ptr sock)
 	}
 }
 
-void KSService::ReleaseSession(AsyncTcpConnectionPtr session)
+void KSService::ReleaseSession(const std::string& guid)
 {
-	std::lock_guard<std::mutex> lock(m_listMutex);
-	auto iter = m_sessionList.begin();
-	for (; iter != m_sessionList.end(); )
+	std::lock_guard<std::mutex> lock(m_MapMutex);
+	auto iter = m_SessionMap.find(guid);
+	if (iter != m_SessionMap.end())
 	{
-		if (*iter == session)
-		{
-			m_sessionList.erase(iter);
-			break;
-		}
-		++iter;
+		KSLogService::GetInstance()->OutputClient(
+			iter->second->GetAddrStr().c_str(), false);
+		m_SessionMap.erase(iter);
 	}
-	KSLogService::GetInstance()->OutputClient(
-		session->GetAddrStr().c_str(), false);
+
 }
 
-unsigned short KSService::GetColorPort()
+
+KSKinectDataServerPtr KSService::GetColorServerPtr()
 {
-	if (m_ColorServerPtr)
-		return m_ColorServerPtr->GetPort();
-	return 0;
+	return m_ColorServerPtr;
 }
-unsigned short KSService::GetDepthPort()
+
+KSKinectDataServerPtr KSService::GetDepthServerPtr()
 {
-	if (m_DepthServerPtr)
-		return m_DepthServerPtr->GetPort();
-	return 0;
+	return m_DepthServerPtr;
 }
-unsigned short KSService::GetSkeletonPort()
+
+KSKinectDataServerPtr KSService::GetSkeleServerPtr()
 {
-	if (m_SkeletonServerPtr)
-		return m_SkeletonServerPtr->GetPort();
-	return 0;
+	return m_SkeletonServerPtr;
 }
 
 void KSService::Release()

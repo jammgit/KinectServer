@@ -6,6 +6,8 @@
 #include "IKSService.h"
 #include "KSSession.h"
 #include <mutex>
+#include <string>
+#include <map>
 
 class KSSession;
 typedef boost::shared_ptr<KSSession> KSSessionPtr;
@@ -14,11 +16,9 @@ typedef std::list<KSSessionPtr> KSSessionPtrList;
 class KSService;
 typedef boost::shared_ptr<KSService> KSServicePtr;
 
-class KSKinectDataServer;
-typedef boost::shared_ptr<KSKinectDataServer> KSKinectDataServerPtr;
 
-//class KSService;
-//extern template class AsyncTcpServer<KSService>;
+using StrGUID = std::string;
+typedef std::map<StrGUID, KSSessionPtr> KSSessionMap;
 
 class KSService
 	: public IKSService
@@ -30,11 +30,11 @@ public:
 	KSService();
 	~KSService();
 
-	unsigned short GetColorPort() override;
-	unsigned short GetDepthPort() override;
-	unsigned short GetSkeletonPort() override;
+	KSKinectDataServerPtr GetColorServerPtr() override;
+	KSKinectDataServerPtr GetDepthServerPtr() override;
+	KSKinectDataServerPtr GetSkeleServerPtr() override;
 
-	void ReleaseSession(AsyncTcpConnectionPtr session) override;
+	void ReleaseSession(const std::string& guid) override;
 	void Stop() override;
 
 protected:
@@ -45,8 +45,11 @@ protected:
 	void Release();
 
 private:
-	std::mutex m_listMutex;
-	KSSessionPtrList m_sessionList;
+	//std::mutex m_listMutex;
+	//KSSessionPtrList m_sessionList;
+
+	std::mutex m_MapMutex;
+	KSSessionMap m_SessionMap;
 
 	KSKinectDataServerPtr m_ColorServerPtr;
 	KSKinectDataServerPtr m_DepthServerPtr;

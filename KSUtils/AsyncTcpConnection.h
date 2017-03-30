@@ -41,11 +41,11 @@ public:
 	//发送协议
 	virtual void SendShareFrame(ShareFrame frame) {};
 
-	//发送Kinect数据
-	virtual void Open() {};
-	virtual void Close() {};
-	virtual void Send264Frame(Middle264FramePtr frame) {};
-	virtual void SendSkeletonFrame(SkeletonFramePtr frame) {};
+	////发送Kinect数据
+	//virtual void Open() {};
+	//virtual void Close() {};
+	//virtual void Send264Frame(Middle264FramePtr frame) {};
+	//virtual void SendSkeletonFrame(SkeletonFramePtr frame) {};
 
 protected:
 	void HandleRead(

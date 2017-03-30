@@ -1,17 +1,17 @@
 #include "KSKinectDataServer.h"
 #include "KSKinectDataEncoder.h"
 #include "KSKinectDataSender.h"
+#include "DataChannelProto.pb.h"
 #include "../KSUtils/PortsMacro.h"
 
-std::mutex KSKinectDataServer::m_SenderListMutex;
-std::mutex KSKinectDataServer::m_ClientSockMutex;
-std::mutex KSKinectDataServer::m_CmdSockMutex;
+std::map<unsigned short, KSKinectDataEncoder::eSrcType>
+	KSKinectDataServer::m_Port2SrcTypeMap = 
+	{ 
+		{ PORT_COLORDATA , KSKinectDataEncoder::SRC_TYPE_COLOR},
+		{ PORT_DEPTHDATA , KSKinectDataEncoder::SRC_TYPE_DEPTH},
+		{ PORT_SKELETONDATA , KSKinectDataEncoder::SRC_TYPE_SKELETON}
+	};
 
-KSKinectDataSenderPtrList KSKinectDataServer::m_SenderPtrList;//数据信道套接字
-
-std::map<Address, Addresses> KSKinectDataServer::m_ClientAddrMap; //<控制信道地址，数据信道地址>
-
-std::map<Address, AsyncTcpConnectionPtr> KSKinectDataServer::m_CmdSockMap; //<控制信道地址，控制信道套接字>
 
 KSKinectDataServer::KSKinectDataServer(unsigned short port)
 	: AsyncTcpServer(port)
@@ -27,93 +27,6 @@ void KSKinectDataServer::WorkingFunc()
 	AsyncTcpServer::Start();
 }
 
-void KSKinectDataServer::SetDataAddrByCmdAddr(
-	const Address& cmdaddr,
-	const Addresses& dataaddrs)
-{
-	std::lock_guard<std::mutex> lock(m_ClientSockMutex);
-	m_ClientAddrMap[cmdaddr] = dataaddrs;
-}
-
-bool KSKinectDataServer::ResetDataAddrByCmdAddr(
-	const Address& cmdaddr,
-	Addresses& dataaddrs)
-{
-	std::lock_guard<std::mutex> lock(m_ClientSockMutex);
-	auto iter = m_ClientAddrMap.find(cmdaddr);
-	if (iter == m_ClientAddrMap.end())
-		return false;
-	dataaddrs = iter->second;
-	m_ClientAddrMap.erase(iter);
-	return true;
-}
-
-void KSKinectDataServer::SetSockByCmdAddr(
-	const Address& cmdaddr,
-	const AsyncTcpConnectionPtr& conn)
-{
-	std::lock_guard<std::mutex> lock(m_CmdSockMutex);
-	m_CmdSockMap[cmdaddr] = conn;
-}
-
-void KSKinectDataServer::ResetSockByCmdAddr(
-	const Address& cmdaddr)
-{
-	std::lock_guard<std::mutex> lock(m_CmdSockMutex);
-	auto iter = m_CmdSockMap.find(cmdaddr);
-	if (iter == m_CmdSockMap.end())
-		return;
-	m_CmdSockMap.erase(iter);
-}
-
-void KSKinectDataServer::CloseSenders(const Addresses& addrs)
-{
-	std::lock_guard<std::mutex> lock(m_SenderListMutex);
-	for (int i = 0; i < 3; ++i)
-	{
-		auto iter = m_SenderPtrList.begin();
-		for (; iter != m_SenderPtrList.end(); ++iter)
-		{
-			if ((*iter)->GetAddrPort() == addrs.addr[i])
-			{
-				(*iter)->Close();
-				m_SenderPtrList.erase(iter);
-				break;
-			}
-		}
-	}
-}
-
-void KSKinectDataServer::ReleaseSender(AsyncTcpConnectionPtr sender)
-{
-	std::lock_guard<std::mutex> lock(m_SenderListMutex);
-	auto iter = m_SenderPtrList.begin();
-	while (iter != m_SenderPtrList.end())
-	{
-		if (*iter == sender)
-		{
-			m_SenderPtrList.erase(iter);
-			break;
-		}
-		++iter;
-	}
-}
-
-bool KSKinectDataServer::IsColor()
-{
-	return GetPort() == PORT_COLORDATA;
-}
-
-bool KSKinectDataServer::IsDepth()
-{
-	return GetPort() == PORT_DEPTHDATA;
-}
-
-bool KSKinectDataServer::IsSkeleton()
-{
-	return GetPort() == PORT_SKELETONDATA;
-}
-
 void KSKinectDataServer::Stop()
 {
 	AsyncTcpServer::Stop();
@@ -121,31 +34,89 @@ void KSKinectDataServer::Stop()
 	Thread::Stop();
 }
 
+bool KSKinectDataServer::RegisterCmdSock(
+	const StrGUID& guid,
+	AsyncTcpConnectionPtr conn)
+{
+	std::lock_guard<std::mutex> lock(m_MapMutex);
+	m_Guid2CmdSockMap[guid] = conn;
+	return true;
+}
+
+bool KSKinectDataServer::GetCmdSock(
+	const StrGUID& guid,
+	AsyncTcpConnectionPtr& conn)
+{
+	std::lock_guard<std::mutex> lock(m_MapMutex);
+	auto iter = m_Guid2CmdSockMap.find(guid);
+	if (iter != m_Guid2CmdSockMap.end())
+	{
+		conn = iter->second;
+		return true;
+	}
+	return false;
+}
+
+bool KSKinectDataServer::RegisterDataSock(
+	const StrGUID& guid,
+	const std::string& devname,
+	AsyncTcpConnectionPtr conn)
+{
+	std::lock_guard<std::mutex> lock(m_MapMutex);
+	m_Guid2DataSockMap[guid][devname] = conn;
+	return true;
+}
+
+bool KSKinectDataServer::UnRegisterAllSock(
+	const StrGUID& guid,
+	const std::string& devname)
+{
+	std::lock_guard<std::mutex> lock(m_MapMutex);
+
+	auto iter = m_Guid2CmdSockMap.find(guid);
+	if (iter != m_Guid2CmdSockMap.end())
+		m_Guid2CmdSockMap.erase(iter);
+
+	auto iter_1 = m_Guid2DataSockMap.find(guid);
+	if (iter_1 != m_Guid2DataSockMap.end())
+	{
+		auto iter_2 = iter_1->second.find(devname);
+		if (iter_2 != iter_1->second.end())
+		{
+			iter_1->second.erase(iter_2);
+			if (iter_1->second.empty())
+			{
+				m_Guid2DataSockMap.erase(iter_1);
+			}
+		}
+	}
+	return true;
+}
+
+
+//void KSKinectDataServer::ReleaseSender(AsyncTcpConnectionPtr sender)
+//{
+//	std::lock_guard<std::mutex> lock(m_SenderListMutex);
+//	auto iter = m_SenderPtrList.begin();
+//	while (iter != m_SenderPtrList.end())
+//	{
+//		if (*iter == sender)
+//		{
+//			m_SenderPtrList.erase(iter);
+//			break;
+//		}
+//		++iter;
+//	}
+//}
+
+
+
 void KSKinectDataServer::CreateConnection(socket_ptr sock)
 {
-	std::lock_guard<std::mutex> lock(m_SenderListMutex);
 	KSKinectDataSenderPtr sender = NULL;
 
-	switch (GetPort())
-	{
-	case PORT_COLORDATA:
-		sender = boost::make_shared<KSKinectDataSender>(
-			this, sock, KSKinectDataEncoder::SRC_TYPE_COLOR);
-		break;
-	case PORT_DEPTHDATA:
-		sender = boost::make_shared<KSKinectDataSender>(
-			this, sock, KSKinectDataEncoder::SRC_TYPE_DEPTH);
-		break;
-	case PORT_SKELETONDATA:
-		sender = boost::make_shared<KSKinectDataSender>(
-			this, sock, KSKinectDataEncoder::SRC_TYPE_SKELETON);
-		break;
-	default:
-		break;
-	}
+	sender = boost::make_shared<KSKinectDataSender>(
+		shared_from_this(), sock, m_Port2SrcTypeMap[this->GetPort()]);
 
 	sender->DoRead();
-	sender->Open();
-
-	m_SenderPtrList.push_back(sender);
 }

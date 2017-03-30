@@ -61,6 +61,23 @@
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;KSLogService.lib;KSKinectDataService.lib;KSService.lib;KSUtils.lib;boost_system-vc140-mt-gd-1_62.lib;boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>Xcopy /s/y ..\bin\boost\debug $(SolutionDir)$(Platform)\$(Configuration)
+Xcopy /s/y ..\Runtime\Debug\Qt5* $(SolutionDir)$(Platform)\$(Configuration)
+Xcopy ..\Runtime\Common\Kinect10.dll $(SolutionDir)$(Platform)\$(Configuration)
+
+rd /s/q ..\Build 
+md ..\Build 
+Xcopy /s/y ..\bin\boost\debug ..\Build 
+Xcopy /s/y ..\Runtime\Common ..\Build 
+Xcopy /s/y ..\Runtime\Debug ..\Build 
+Xcopy /s/y $(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe ..\Build 
+
+
+
+
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -77,6 +94,18 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;KSLogService.lib;KSKinectDataService.lib;KSUtils.lib;KSService.lib;boost_chrono-vc140-mt-1_62.lib;boost_date_time-vc140-mt-1_62.lib;boost_regex-vc140-mt-1_62.lib;boost_system-vc140-mt-1_62.lib;boost_thread-vc140-mt-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>Xcopy /s/y ..\bin\boost\release $(SolutionDir)$(Platform)\$(Configuration)
+Xcopy /s/y ..\Runtime\Release\Qt5* $(SolutionDir)$(Platform)\$(Configuration)
+Xcopy ..\Runtime\Common\Kinect10.dll $(SolutionDir)$(Platform)\$(Configuration)
+
+rd /s/q ..\Build 
+md ..\Build 
+Xcopy /s/y ..\bin\boost\release ..\Build 
+Xcopy /s/y ..\Runtime\Common ..\Build 
+Xcopy /s/y ..\Runtime\Release ..\Build 
+Xcopy /s/y $(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe ..\Build </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_KinectServer.cpp">

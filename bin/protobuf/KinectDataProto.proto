@@ -2,20 +2,31 @@ syntax="proto3";
 
 package KinectDataProto;
 
+// 客户端向服务器请求某特定设备数据的传输
 message pbReqStart
 {
-string deviceName = 1;
-int32 colorPort = 2;
-int32 depthPort = 3;
-int32 skelePort = 4;
-
+    string deviceName = 1;
 }
 
+//请求设备结果
 message pbRespStart
 {
-int32 resultType = 1;
-string failReason = 2;
-int32 colorPort = 3;
-int32 depthPort = 4;
-int32 skelePort = 5;
+    string deviceName = 1;
+    int32 resultType = 2;
+    string failReason = 3;
+}
+
+// 服务器主动断开某特定设备的数据传输
+message pbEndTransfer
+{
+    string deviceName = 1;
+    int32 type = 2;
+    string reason = 3;
+}
+
+// 客户端主动向服务器请求断开某特定设备的数据传输
+message pbReqEnd
+{
+    string deviceName = 1;
+    string reason = 2;
 }

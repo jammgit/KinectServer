@@ -2,6 +2,9 @@
 
 #include "../KSUtils/ShareFrame.h"
 
+class IKSKinectDataService;
+typedef boost::shared_ptr<IKSKinectDataService> IKSKinectDataServicePtr;
+
 class IKSSession
 {
 public:
@@ -30,7 +33,10 @@ public:
 	virtual ~IKSSession() {};
 
 	virtual void RegisterAllService() = 0;
+	virtual IKSKinectDataServicePtr KinectDataService() = 0;
+	virtual std::string StrGuid() = 0;
 	virtual void DoFrame(const ShareFrame& frame) = 0;
 
 	virtual void SendShareFrame(ShareFrame frame) = 0;
+
 };

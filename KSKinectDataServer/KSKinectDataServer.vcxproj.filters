@@ -24,6 +24,9 @@
     <ClCompile Include="KSKinectDataServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DataChannelProto.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KSKinectDataEncoder.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KSKinectDataServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataChannelProto.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

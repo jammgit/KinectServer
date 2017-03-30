@@ -1,5 +1,6 @@
 #include "KSKinectDataEncoder.h"
-#include "../KSUtils/AsyncTcpConnection.h"
+#include "KSKinectDataSender.h"
+//#include "../KSUtils/AsyncTcpConnection.h"
 #include "../IKSKineckH264Encode/Openh264Encoder.h"
 #include "../IKSKinectDataCapture/KinectDataCapturer.h"
 #include "../KSUtils/CharsetUtils.h"
@@ -146,7 +147,11 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 					out_linesize[i],
 					out_data[i]);
 
-				m_pSender->Send264Frame(encodedFrame);
+				if (m_pSender)
+				{
+					static_cast<KSKinectDataSender*>(m_pSender.get())
+						->Send264Frame(encodedFrame);
+				}
 			}
 		}
 	}
@@ -171,7 +176,11 @@ bool KSKinectDataEncoder::EncodeSkeleton()
 			if (b) return false; //kinect ¶Ï¿ª
 		}
 
-		m_pSender->SendSkeletonFrame(frame);
+		if (m_pSender)
+		{
+			static_cast<KSKinectDataSender*>(m_pSender.get())
+				->SendSkeletonFrame(frame);
+		}
 	}
 	return true;
 }

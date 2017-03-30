@@ -24,12 +24,18 @@ public:
 	{
 		SUCCESS = 1,
 		FAIL = -100,
-	}sResultType;
+	}eResultType;
+
+	typedef enum
+	{
+		ERR_SOCKET = 1,
+		ERR_DEVICE = 2,
+	}eSvrEndType;
 
 public:
 	virtual ~IKSKinectDataService() {};
 
 	virtual void DoFrame(const ShareFrame& frame) = 0;
 
-	virtual void SendEnd() = 0;
+	virtual void SendEnd(eSvrEndType type, const std::string& devname) = 0;
 };

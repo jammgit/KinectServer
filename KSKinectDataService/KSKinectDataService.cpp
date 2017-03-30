@@ -9,9 +9,10 @@
 #include "../KSService/IKSService.h"
 #include "../KSKinectDataServer/KSKinectDataServer.h"
 
-KSKinectDataService::KSKinectDataService(IKSService* service, KSSession *session)
-	: m_pSession(session)
-	, m_pService(service)
+KSKinectDataService::KSKinectDataService(
+	IKSServicePtr service, IKSSessionPtr session)
+	: m_Session(session)
+	, m_Service(service)
 {
 }
 
@@ -39,22 +40,10 @@ void KSKinectDataService::DoFrame(const ShareFrame& frame)
 	}
 }
 
-void KSKinectDataService::SendEnd()
-{
-	//主动停止发送
-	std::string data;
-	ShareFrame frame = FrameBuffer::Make(
-		data,
-		IKSSession::CMD_TYPE_KINECT,
-		IKSKinectDataService::CMD_NUM_SVR_END_REQ,
-		'0',
-		0);
 
-	if (m_pSession) m_pSession->SendShareFrame(frame);
-}
 
 void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
-{
+{//获取设备并回复状态
 	KinectDataProto::pbReqStart start;
 	if (start.ParseFromArray(frame->m_data, frame->m_u32length))
 	{
@@ -77,25 +66,13 @@ void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 		KinectDataProto::pbRespStart respStart;
 		respStart.set_resulttype(SUCCESS);
 		respStart.set_failreason("Success");
+		respStart.set_devicename(name);
 		if (!found)
 		{
 			respStart.set_resulttype(FAIL);
 			respStart.set_failreason("no such device");
 		}
-		else
-		{
-			respStart.set_colorport(m_pService->GetColorPort());
-			respStart.set_depthport(m_pService->GetDepthPort());
-			respStart.set_skeleport(m_pService->GetSkeletonPort());
 
-			//将关系记录到Server
-			Addresses addrs;
-			addrs.addr[0] = { m_pSession->GetAddrPort().addr, (unsigned short)start.colorport() };
-			addrs.addr[1] = { m_pSession->GetAddrPort().addr, (unsigned short)start.depthport() };
-			addrs.addr[2] = { m_pSession->GetAddrPort().addr, (unsigned short)start.skeleport() };
-			KSKinectDataServer::SetDataAddrByCmdAddr(m_pSession->GetAddrPort(), addrs);
-			KSKinectDataServer::SetSockByCmdAddr(m_pSession->GetAddrPort(), m_pSession->shared_from_this());
-		}
 		std::string data;
 		respStart.SerializeToString(&data);
 
@@ -106,17 +83,40 @@ void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 			frame->m_version,
 			frame->m_u32Sequence);
 
-		if (m_pSession) m_pSession->SendShareFrame(frame);
+		if (m_Session) m_Session->SendShareFrame(frame);
 	}
 }
 
 void KSKinectDataService::ProcessEndReq(const ShareFrame& frame)
-{
-	//停止发送数据
-	Addresses addrs;
-	if (KSKinectDataServer::ResetDataAddrByCmdAddr(
-		m_pSession->GetAddrPort(), addrs))
-	{
-		KSKinectDataServer::CloseSenders(addrs);
-	}
+{//客户端请求停止发送数据
+	KinectDataProto::pbReqEnd end;
+	end.devicename();
+	m_Session->StrGuid();
+	
+
+	//Addresses addrs;
+	//if (KSKinectDataServer::ResetDataAddrByCmdAddr(
+	//	m_pSession->GetAddrPort(), addrs))
+	//{
+	//	KSKinectDataServer::CloseSenders(addrs);
+	//}
+}
+
+void KSKinectDataService::SendEnd(eSvrEndType type, const std::string& devname)
+{//主动停止发送
+	KinectDataProto::pbEndTransfer end;
+	end.set_devicename(devname);
+	end.set_type(type);
+	end.set_reason("Close");
+	
+	std::string data;
+	end.SerializeToString(&data);
+	ShareFrame frame = FrameBuffer::Make(
+		data,
+		IKSSession::CMD_TYPE_KINECT,
+		IKSKinectDataService::CMD_NUM_SVR_END_REQ,
+		'0',
+		0);
+
+	if (m_Session) m_Session->SendShareFrame(frame);
 }

@@ -1,8 +1,8 @@
 # Kinect Server
 ## 简述
-[![](icon.png)](https://github.com/jammgit/KinectServer)
+[![](icon.png)](https://github.com/jammgit/KinectServer "KinectServer")
 
-> 这是一个`网络化Kinect`设备数据的工程,属服务端开发。
+> 这是一个**`网络化Kinect`**设备数据的32位QT工程,属服务端开发。
 
 ## 开发环境
 * Visual Studio 2015
@@ -37,4 +37,9 @@
 
 
 ## 客户端Git
-[https://github.com/joshion/3DShow](https://github.com/joshion/3DShow)
+[https://github.com/joshion/3DShow][clientgit]
+
+
+
+[clientgit]:https://github.com/joshion/3DShow "3DShow"
+

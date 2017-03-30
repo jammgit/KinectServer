@@ -92,7 +92,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\lib\boost\debug;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_system-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ole32.lib;boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_system-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -122,7 +122,7 @@
       <AdditionalDependencies>boost_chrono-vc140-mt-1_62.lib;boost_date_time-vc140-mt-1_62.lib;boost_regex-vc140-mt-1_62.lib;boost_system-vc140-mt-1_62.lib;boost_thread-vc140-mt-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>boost_chrono-vc140-mt-1_62.lib;boost_date_time-vc140-mt-1_62.lib;boost_regex-vc140-mt-1_62.lib;boost_system-vc140-mt-1_62.lib;boost_thread-vc140-mt-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ole32.lib;boost_chrono-vc140-mt-1_62.lib;boost_date_time-vc140-mt-1_62.lib;boost_regex-vc140-mt-1_62.lib;boost_system-vc140-mt-1_62.lib;boost_thread-vc140-mt-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>..\lib\boost\release;</AdditionalLibraryDirectories>
@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="AsyncTcpConnection.cpp" />
     <ClCompile Include="AsyncTcpServer.cpp" />
+    <ClCompile Include="GuidProcessUtil.cpp" />
     <ClCompile Include="ProtocProcess.cpp" />
     <ClCompile Include="ShareData.cpp" />
     <ClCompile Include="ShareFrame.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="AsyncTcpConnection.h" />
     <ClInclude Include="AsyncTcpServer.h" />
     <ClInclude Include="CharsetUtils.h" />
+    <ClInclude Include="GuidProcessUtil.h" />
     <ClInclude Include="PortsMacro.h" />
     <ClInclude Include="ProtocProcess.h" />
     <ClInclude Include="ShareData.h" />

@@ -9,13 +9,15 @@
 #include <list>
 #include <map>
 
-typedef std::list<KSKinectDataSenderPtr> KSKinectDataSenderPtrList;
-
-//class KSKinectDataServer;
-//extern template class AsyncTcpServer<KSKinectDataServer>;
+using StrGuid = std::string;
 
 class AsyncTcpConnection;
 typedef boost::shared_ptr<AsyncTcpConnection> AsyncTcpConnectionPtr;
+
+typedef std::list<KSKinectDataSenderPtr> KSKinectDataSenderPtrList;
+
+typedef std::map<std::string, AsyncTcpConnectionPtr> DevName2KinectDataSenderMap;
+
 
 class KSKinectDataServer
 	: public AsyncTcpServer
@@ -25,41 +27,37 @@ public:
 	KSKinectDataServer(unsigned short port);
 	~KSKinectDataServer();
 
-	static void SetDataAddrByCmdAddr(
-		const Address& cmdaddr,
-		const Addresses& dataaddrs);
-
-	static bool ResetDataAddrByCmdAddr(
-		const Address& cmdaddr,
-		Addresses& dataaddrs);
-
-	static void SetSockByCmdAddr(
-		const Address& cmdaddr,
-		const AsyncTcpConnectionPtr& conn);
-	static void ResetSockByCmdAddr(
-		const Address& cmdaddr);
-
-	static void CloseSenders(const Addresses& addrs);
-
-	void ReleaseSender(AsyncTcpConnectionPtr sender);
-
-	bool IsColor();
-	bool IsDepth();
-	bool IsSkeleton();
-
 	void Stop() override;
+
+	//cmd socket接收到开始请求后注册信息
+	bool RegisterCmdSock(
+		const StrGUID& guid,
+		AsyncTcpConnectionPtr conn);
+	bool GetCmdSock(
+		const StrGUID& guid,
+		AsyncTcpConnectionPtr& conn);
+
+	//data socket 接收到数据后注册信息
+	bool RegisterDataSock(
+		const StrGUID& guid,
+		const std::string& devname,
+		AsyncTcpConnectionPtr conn); 
+
+	//这里还有问题！！！！
+	// 结束数据传输后执行删除信息
+	bool UnRegisterAllSock(
+		const StrGUID& guid,
+		const std::string& devname);
 
 protected:
 	void WorkingFunc() override;
 	void CreateConnection(socket_ptr sock) override;
 
 private:
-	static std::mutex m_SenderListMutex;
-	static KSKinectDataSenderPtrList m_SenderPtrList;//数据信道套接字
-
-	static std::mutex m_ClientSockMutex;
-	static std::map<Address, Addresses> m_ClientAddrMap; //<控制信道地址，数据信道地址>
-
-	static std::mutex m_CmdSockMutex;
-	static std::map<Address, AsyncTcpConnectionPtr> m_CmdSockMap; //<控制信道地址，控制信道套接字>
+	
+	std::mutex m_MapMutex;
+	std::map<StrGuid, AsyncTcpConnectionPtr> m_Guid2CmdSockMap; //数据信道获取控制信道socket
+	std::map<StrGuid, DevName2KinectDataSenderMap> m_Guid2DataSockMap; //控制信道socket拥有的数据socket
+	
+	static std::map<unsigned short, KSKinectDataEncoder::eSrcType> m_Port2SrcTypeMap;
 };
