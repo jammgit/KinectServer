@@ -21,7 +21,6 @@ typedef std::map<StrGUID, KSSessionPtr> KSSessionMap;
 
 class KSService
 	: public IKSService
-	//, public AsyncTcpServer<KSService>
 	, public Thread
 	, public Singleton<KSService>
 {

@@ -6,7 +6,7 @@
 #include "../KSKinectDataServer/KSKinectDataServer.h"
 
 KSService::KSService()
-	: IKSService(PORT_KSSERVICE)//AsyncTcpServer<KSService>(PORT_KSSERVICE)
+	: IKSService(PORT_KSSERVICE)
 	, m_ColorServerPtr(NULL)
 	, m_DepthServerPtr(NULL)
 	, m_SkeletonServerPtr(NULL)
