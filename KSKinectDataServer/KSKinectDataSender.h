@@ -17,9 +17,6 @@ typedef boost::shared_ptr<KSKinectDataEncoder> KSKinectDataEncoderPtr;
 class KSKinectDataServer;
 typedef boost::shared_ptr<KSKinectDataServer> KSKinectDataServerPtr;
 
-//class AsyncTcpServer;
-//typedef boost::shared_ptr<AsyncTcpServer> AsyncTcpServerPtr;
-
 class KSKinectDataSender;
 typedef boost::shared_ptr<KSKinectDataSender> KSKinectDataSenderPtr;
 
@@ -55,7 +52,7 @@ public:
 	inline void EndProcess();
 
 private:
-	KSKinectDataServerPtr m_pServer;
+	KSKinectDataServerPtr m_Server;
 
 	ProtocProcess m_ProtoProcess;
 

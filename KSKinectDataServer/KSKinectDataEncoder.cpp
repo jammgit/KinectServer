@@ -152,7 +152,6 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 			}
 		}
 	}
-
 	return true;
 }
 

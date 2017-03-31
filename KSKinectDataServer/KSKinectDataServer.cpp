@@ -38,8 +38,33 @@ bool KSKinectDataServer::RegisterCmdSock(
 	const StrGUID& guid,
 	IKSSessionPtr conn)
 {
-	std::lock_guard<std::mutex> lock(m_MapMutex);
+	std::lock_guard<std::mutex> lock(m_CmdSockMutex);
 	m_Guid2CmdSockMap[guid] = conn;
+	return true;
+}
+
+bool KSKinectDataServer::UnregisterCmdSock(
+	const StrGUID& guid)
+{
+	{
+		std::lock_guard<std::mutex> lock(m_CmdSockMutex);
+		auto iter = m_Guid2CmdSockMap.find(guid);
+		if (iter != m_Guid2CmdSockMap.end())
+		{
+			m_Guid2CmdSockMap.erase(iter);
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(m_DataSockMutex);
+		auto iter = m_Guid2DataSockMap.find(guid);
+		if (iter != m_Guid2DataSockMap.end())
+		{
+			iter->second.clear();
+			m_Guid2DataSockMap.erase(iter);
+		}
+	}
+
+
 	return true;
 }
 
@@ -47,7 +72,7 @@ bool KSKinectDataServer::GetCmdSock(
 	const StrGUID& guid,
 	IKSSessionPtr& conn)
 {
-	std::lock_guard<std::mutex> lock(m_MapMutex);
+	std::lock_guard<std::mutex> lock(m_CmdSockMutex);
 	auto iter = m_Guid2CmdSockMap.find(guid);
 	if (iter != m_Guid2CmdSockMap.end())
 	{
@@ -62,37 +87,28 @@ bool KSKinectDataServer::RegisterDataSock(
 	const std::string& devname,
 	KSKinectDataSenderPtr conn)
 {
-	std::lock_guard<std::mutex> lock(m_MapMutex);
+	std::lock_guard<std::mutex> lock(m_DataSockMutex);
 	m_Guid2DataSockMap[guid][devname] = conn;
 	return true;
 }
 
-bool KSKinectDataServer::UnRegisterAllSock(
+bool KSKinectDataServer::UnRegisterDataSock(
 	const StrGUID& guid,
 	const std::string& devname)
 {
-	std::lock_guard<std::mutex> lock(m_MapMutex);
-
-	auto iter = m_Guid2CmdSockMap.find(guid);
-	if (iter != m_Guid2CmdSockMap.end())
-		m_Guid2CmdSockMap.erase(iter);
-
+	std::lock_guard<std::mutex> lock(m_DataSockMutex);
 	auto iter_1 = m_Guid2DataSockMap.find(guid);
 	if (iter_1 != m_Guid2DataSockMap.end())
 	{
 		auto iter_2 = iter_1->second.find(devname);
 		if (iter_2 != iter_1->second.end())
 		{
-			iter_1->second.erase(iter_2);
-			if (iter_1->second.empty())
-			{
-				m_Guid2DataSockMap.erase(iter_1);
-			}
+			iter_2->second->Close();
+			iter_1->second[iter_2->first] = NULL;
 		}
 	}
 	return true;
 }
-
 
 void KSKinectDataServer::CreateConnection(socket_ptr sock)
 {

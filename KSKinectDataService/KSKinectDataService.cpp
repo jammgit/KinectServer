@@ -90,14 +90,26 @@ void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 void KSKinectDataService::ProcessEndReq(const ShareFrame& frame)
 {//客户端请求停止发送数据
 	KinectDataProto::pbReqEnd end;
-	end.devicename();
-	m_Session->StrGuid();
-	
-
+	if (end.ParseFromArray(frame->m_data, frame->m_u32length))
+	{
+		m_Service->GetColorServerPtr()->UnRegisterDataSock(
+			m_Session->StrGuid(), end.devicename());
+		m_Service->GetDepthServerPtr()->UnRegisterDataSock(
+			m_Session->StrGuid(), end.devicename());
+		m_Service->GetSkeleServerPtr()->UnRegisterDataSock(
+			m_Session->StrGuid(), end.devicename());
+	}
 }
 
 void KSKinectDataService::SendEnd(eSvrEndType type, const std::string& devname)
 {//主动停止发送
+	m_Service->GetColorServerPtr()->UnRegisterDataSock(
+		m_Session->StrGuid(), devname);
+	m_Service->GetDepthServerPtr()->UnRegisterDataSock(
+		m_Session->StrGuid(), devname);
+	m_Service->GetSkeleServerPtr()->UnRegisterDataSock(
+		m_Session->StrGuid(), devname);
+
 	KinectDataProto::pbEndTransfer end;
 	end.set_devicename(devname);
 	end.set_type(type);

@@ -12,7 +12,7 @@ KSKinectDataSender::KSKinectDataSender(
 	: AsyncTcpConnection<KSKinectDataSender>(sock)
 	, m_EncoderPtr(NULL)
 	, m_type(type)
-	, m_pServer(server)
+	, m_Server(server)
 {
 }
 
@@ -88,11 +88,9 @@ void KSKinectDataSender::TryParse(const ShareData& data)
 				m_StrGuid = pkg.guid();
 				m_DevName = pkg.devicename();
 				// 注册信息
-				KSKinectDataServer* server = NULL;
-				if (m_pServer
-					&& (server = static_cast<KSKinectDataServer*>(m_pServer.get())))
+				if (m_Server)
 				{
-					server->RegisterDataSock(
+					m_Server->RegisterDataSock(
 						pkg.guid(),
 						pkg.devicename(),
 						shared_from_this());
@@ -104,8 +102,6 @@ void KSKinectDataSender::TryParse(const ShareData& data)
 					shared_from_this(), m_type, m_DevName);
 
 				if (m_EncoderPtr) m_EncoderPtr->Start();
-
-
 			}
 		}
 
@@ -119,12 +115,10 @@ void KSKinectDataSender::DeviceUnlink()
 	std::lock_guard<std::mutex> lock(m_ReleaseMutex);
 	if (!m_StrGuid.empty())
 	{//有可能在没收到指令前就断开了socket
-		KSKinectDataServer* server = NULL;
-		if (m_pServer
-			&& (server = static_cast<KSKinectDataServer*>(m_pServer.get())))
+		if (m_Server)
 		{
 			IKSSessionPtr cmdSock;
-			if (server->GetCmdSock(m_StrGuid, cmdSock))
+			if (m_Server->GetCmdSock(m_StrGuid, cmdSock))
 			{
 				IKSKinectDataServicePtr kdService
 					= cmdSock->KinectDataService();
@@ -148,12 +142,10 @@ void KSKinectDataSender::Release()
 	std::lock_guard<std::mutex> lock(m_ReleaseMutex);
 	if (!m_StrGuid.empty())
 	{//有可能在没收到指令前就断开了socket
-		KSKinectDataServer* server = NULL;
-		if (m_pServer
-			&& (server = static_cast<KSKinectDataServer*>(m_pServer.get())))
+		if (m_Server)
 		{
 			IKSSessionPtr cmdSock;
-			if (server->GetCmdSock(m_StrGuid, cmdSock))
+			if (m_Server->GetCmdSock(m_StrGuid, cmdSock))
 			{
 				IKSKinectDataServicePtr kdService
 					= cmdSock->KinectDataService();

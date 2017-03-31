@@ -34,6 +34,9 @@ public:
 		const StrGUID& guid,
 		IKSSessionPtr conn);
 
+	bool UnregisterCmdSock(
+		const StrGUID& guid);
+
 	bool GetCmdSock(
 		const StrGUID& guid,
 		IKSSessionPtr& conn);
@@ -44,9 +47,8 @@ public:
 		const std::string& devname,
 		KSKinectDataSenderPtr conn);
 
-	//这里还有问题！！！！
 	// 结束数据传输后执行删除信息
-	bool UnRegisterAllSock(
+	bool UnRegisterDataSock(
 		const StrGUID& guid,
 		const std::string& devname);
 
@@ -56,8 +58,9 @@ public:
 
 private:
 	
-	std::mutex m_MapMutex;
+	std::mutex m_CmdSockMutex;
 	std::map<StrGuid, IKSSessionPtr> m_Guid2CmdSockMap; //数据信道获取控制信道socket
+	std::mutex m_DataSockMutex;
 	std::map<StrGuid, DevName2KinectDataSenderMap> m_Guid2DataSockMap; //控制信道socket拥有的数据socket
 	
 	static std::map<unsigned short, KSKinectDataEncoder::eSrcType> m_Port2SrcTypeMap;

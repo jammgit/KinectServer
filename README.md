@@ -2,7 +2,7 @@
 ## 简述
 [![](icon.png)](https://github.com/jammgit/KinectServer "KinectServer")
 
-> 这是一个**`网络化Kinect`**设备数据的32位QT工程,属服务端开发。
+> 这是一个`网络化Kinect`设备数据的32位QT工程,属服务端开发。
 
 ## 开发环境
 * Visual Studio 2015

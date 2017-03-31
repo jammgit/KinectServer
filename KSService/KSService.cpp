@@ -51,6 +51,10 @@ void KSService::CreateConnection(socket_ptr sock)
 		std::lock_guard<std::mutex> lock(m_MapMutex);
 		m_SessionMap[guid] = session;
 
+		m_ColorServerPtr->RegisterCmdSock(guid, session);
+		m_DepthServerPtr->RegisterCmdSock(guid, session);
+		m_SkeletonServerPtr->RegisterCmdSock(guid, session);
+
 		KSLogService::GetInstance()->OutputMessage("Create Connection\n");
 		KSLogService::GetInstance()->OutputClient(
 			session->GetAddrStr().c_str(), true);
@@ -68,9 +72,16 @@ void KSService::ReleaseSession(const std::string& guid)
 	auto iter = m_SessionMap.find(guid);
 	if (iter != m_SessionMap.end())
 	{
+
 		KSLogService::GetInstance()->OutputClient(
 			iter->second->GetAddrStr().c_str(), false);
+
 		m_SessionMap.erase(iter);
+
+		m_ColorServerPtr->UnregisterCmdSock(guid);
+		m_DepthServerPtr->UnregisterCmdSock(guid);
+		m_SkeletonServerPtr->UnregisterCmdSock(guid);
+
 	}
 
 }

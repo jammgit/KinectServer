@@ -73,8 +73,9 @@ void ProtocProcess::TryParse(const ShareData& data, std::vector<ShareFrame>& fra
 				m_Frame.m_data = new unsigned char[m_Frame.m_u32length]{ 0 };
 			}
 			else
-			{
+			{// ÷°–≈œ¢¥ÌŒÛ
 				m_Status = WAIT_CMD_TYPE;
+				m_Frame.m_u32length = 0;
 				frameList.push_back(FrameBuffer::Make(m_Frame));
 			}
 			break;

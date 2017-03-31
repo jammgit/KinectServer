@@ -160,7 +160,6 @@ void AsyncTcpConnection<T>::HandleRead(
 	}
 
 ReadError: // sock error, how to close.
-		   //printf("socket error\n");
 	connPtr->Release();
 }
 
