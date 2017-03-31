@@ -95,7 +95,7 @@ void KSKinectDataSender::TryParse(const ShareData& data)
 						pkg.devicename(),
 						shared_from_this());
 				}
-
+				 
 				//·ÖÅä±àÂëÏß³Ì
 				std::lock_guard<std::mutex> lock(m_EncoderMutex);
 				m_EncoderPtr = boost::make_shared<KSKinectDataEncoder>(

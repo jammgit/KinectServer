@@ -125,10 +125,7 @@ void AsyncTcpConnection<T>::DoRead()
 				shared_from_this(),
 				sData, _1, _2));
 		m_bFirstTimeRead = false;
-
-		//printf("In Do read\n");
 	}
-	//printf("Do read finish\n");
 }
 
 template <class T>
@@ -188,6 +185,7 @@ void AsyncTcpConnection<T>::HandleWrite(
 	else if (data->Used() == data->Length())
 	{
 		//printf("write success\n");
+		std::lock_guard<std::mutex> lock(m_callingMutex);
 		if (m_dataList.size() > 0)
 		{
 			std::lock_guard<std::mutex> lock(m_dataListMutex);
@@ -202,13 +200,10 @@ void AsyncTcpConnection<T>::HandleWrite(
 			printf("1async_write_some end\n");
 			return;
 		}
-	}
-
-	{
-		std::lock_guard<std::mutex> lock(m_callingMutex);
 		m_bAsyncWriteCalling = false;
 		return;
 	}
+
 
 WriteError:
 	connPtr->Release();
@@ -231,7 +226,7 @@ void AsyncTcpConnection<T>::SendShareData(const ShareData& data)
 			ShareData sData = m_dataList.front();
 			m_dataList.pop_front();
 			printf("0async_write_some begin\n");
-			m_Socket->async_write_some(
+			m_Socket->async_write_some( 
 				buffer(sData->Data(), sData->Length()),
 				boost::bind(&AsyncTcpConnection::HandleWrite,
 					this,

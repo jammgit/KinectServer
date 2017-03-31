@@ -147,6 +147,8 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 					out_linesize[i],
 					out_data[i]);
 
+				
+
 				m_Sender->Send264Frame(encodedFrame);
 
 			}
@@ -192,7 +194,7 @@ void KSKinectDataEncoder::OpenEncode(int w, int h)
 	param.eProfile = PROFILE_MAIN;
 	param.eRcMode = RC_CQP;
 	param.eTune = TUNE_DEFAULT;
-	param.iBitrate = 1280000;
+	param.iBitrate = 640000;
 	param.iFrameRate = 25;
 	param.iHeight = h;
 	param.iWidth = w;

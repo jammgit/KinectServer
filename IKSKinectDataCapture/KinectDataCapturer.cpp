@@ -53,7 +53,6 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 	const wchar_t* instanceName,
 	const wchar_t* uniqueDeviceName)
 {
-	//std::lock_guard<std::mutex> lock(m_callBackMutex);
 
 	if (SUCCEEDED(hrStatus))
 	{//连上
@@ -65,8 +64,6 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 			//创建map
 			m_DevName2DevInfoMap[devInfo->m_instanceName] = devInfo;
 			m_DevName2DevInfoMap[devInfo->m_instanceName]->m_pKinectDataCapturer = this;
-			//m_DevName2DataQueueMap[devInfo->m_deviceName] =
-			//	boost::make_shared<KinectDataCaptureQueue>();
 
 			HRESULT ret = this->NuiInit(devInfo);
 			if (FAILED(ret))
@@ -130,13 +127,10 @@ HRESULT KinectDataCapturer::NuiInit(KinectDeviceInfoPtr& device)
 
 	HRESULT hr = NuiCreateSensorById(device->m_instanceName.c_str(), &device->m_pNuiSensor);
 
-	// Generic creation failure
 	if (FAILED(hr))
 	{
 		return hr;
 	}
-
-	//SysFreeString(m_instanceId);
 
 	device->m_instanceId = device->m_pNuiSensor->NuiDeviceConnectionId();
 
@@ -184,6 +178,8 @@ HRESULT KinectDataCapturer::NuiInit(KinectDeviceInfoPtr& device)
 		2,
 		device->m_hNextDepthFrameEvent,
 		&device->m_pDepthStreamHandle);
+
+
 
 	if (FAILED(hr))
 		return hr;

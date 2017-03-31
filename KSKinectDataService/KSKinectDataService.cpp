@@ -45,7 +45,7 @@ void KSKinectDataService::DoFrame(const ShareFrame& frame)
 void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 {//获取设备并回复状态
 	KinectDataProto::pbReqStart start;
-	if (start.ParseFromArray(frame->m_data, frame->m_u32length))
+ 	if (start.ParseFromArray(frame->m_data, frame->m_u32length))
 	{
 		std::string name = start.devicename();
 		std::wstring wname;
@@ -76,14 +76,14 @@ void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 		std::string data;
 		respStart.SerializeToString(&data);
 
-		ShareFrame frame = FrameBuffer::Make(
+		ShareFrame sFrame = FrameBuffer::Make(
 			data,
 			IKSSession::CMD_TYPE_KINECT,
 			IKSKinectDataService::CMD_NUM_SVR_START_RESP,
 			frame->m_version,
 			frame->m_u32Sequence);
 
-		if (m_Session) m_Session->SendShareFrame(frame);
+		if (m_Session) m_Session->SendShareFrame(sFrame);
 	}
 }
 
