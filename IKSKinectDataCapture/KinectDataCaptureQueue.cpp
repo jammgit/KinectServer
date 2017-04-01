@@ -26,9 +26,16 @@ bool KinectDataCaptureQueue::GetColorFrame(MiddleRgbFramePtr& frame)
 		std::lock_guard<std::mutex> lock(m_ColorMutex);
 		if (m_ColorList.size() > 0)
 		{
-			frame = m_ColorList.front();
-			//m_ColorList.pop_front();
-			return true;
+			auto iter = m_ColorList.begin();
+			for (; iter != m_ColorList.end(); ++iter)
+			{
+				if ((*iter)->m_frameNumber > frame->m_frameNumber)
+				{
+					frame = *iter;
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 	return false;
@@ -50,9 +57,16 @@ bool KinectDataCaptureQueue::GetDepthFrame(MiddleRgbFramePtr& frame)
 		std::lock_guard<std::mutex> lock(m_DepthMutex);
 		if (m_DepthList.size() > 0)
 		{
-			frame = m_DepthList.front();
-			//m_DepthList.pop_front();
-			return true;
+			auto iter = m_DepthList.begin();
+			for (; iter != m_DepthList.end(); ++iter)
+			{
+				if ((*iter)->m_frameNumber > frame->m_frameNumber)
+				{
+					frame = *iter;
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 	return false;

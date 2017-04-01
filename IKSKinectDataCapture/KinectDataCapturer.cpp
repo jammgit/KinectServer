@@ -91,19 +91,19 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 		if (mapiter == m_DevName2DevInfoMap.end())
 			return;
 		NuiUnInit(instanceName);
-
 		m_DevName2DevInfoMap.erase(mapiter);
 
 		auto datamapiter = m_DevName2DataQueueMap.find(instanceName);
 		if (datamapiter == m_DevName2DataQueueMap.end())
 			return;
+		datamapiter->second->StopProvideData();
 		m_DevName2DataQueueMap.erase(datamapiter);
 
 		std::lock_guard<std::mutex> lock(m_ListMutex);
 		auto iter = m_DevNameList.begin();
 		for each(auto elem in m_DevNameList)
 		{
-			if (wcsncmp(elem.c_str(), instanceName, elem.length()))
+			if (wcsncmp(elem.c_str(), instanceName, elem.length()) == 0)
 			{
 				m_DevNameList.erase(iter);
 				break;
@@ -484,8 +484,8 @@ void KinectDataCapturer::NuiUnInit(const wchar_t* uniqueName)
 		info->m_pNuiSensor = NULL;
 	}
 
-	m_DevName2DevInfoMap[uniqueName] = NULL;
+	//m_DevName2DevInfoMap[uniqueName] = NULL;
 	//service capture 可能拥有此智能指针，调用此函数告知设备断开
-	m_DevName2DataQueueMap[uniqueName]->StopProvideData();
-	m_DevName2DataQueueMap[uniqueName] = NULL; //service capture 后面陆续会删除智能指针
+	//m_DevName2DataQueueMap[uniqueName]->StopProvideData();
+	//m_DevName2DataQueueMap[uniqueName] = NULL; //service capture 后面陆续会删除智能指针
 }

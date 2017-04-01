@@ -42,14 +42,14 @@ public:
 	void SendSkeletonFrame(SkeletonFramePtr frame);
 	void DeviceUnlink();
 
-	void Close();
+	
 
 //protected:
 	void TryParse(const ShareData& data) override;
 	void SendShareFrame(ShareFrame frame) {};
 	void Release() override;
 
-	inline void EndProcess();
+
 
 private:
 	KSKinectDataServerPtr m_Server;

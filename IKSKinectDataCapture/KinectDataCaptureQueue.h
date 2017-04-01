@@ -28,7 +28,7 @@ public:
 	virtual bool GetSkeleFrame(SkeletonFramePtr& frame);
 
 private:
-	const int MAX_BUFF_SIZE = 20;
+	const size_t MAX_BUFF_SIZE = 20;
 	std::mutex m_ColorMutex;
 	std::mutex m_DepthMutex;
 	std::mutex m_SkeletonMutex;

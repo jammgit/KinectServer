@@ -90,7 +90,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>KSUtils.lib;KSLogService.lib;IKSKinectH264Encode.lib;yuvd.lib;</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;../lib/libyuv/;</AdditionalLibraryDirectories>
@@ -122,7 +123,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>KSUtils.lib;KSLogService.lib;IKSKinectH264Encode.lib;yuv.lib;</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;../lib/libyuv/;</AdditionalLibraryDirectories>
@@ -146,10 +148,12 @@
     <ClInclude Include="IKSKinectDataClient.h" />
     <ClInclude Include="IKSKinectDataService.h" />
     <ClInclude Include="KinectDataProto.pb.h" />
+    <ClInclude Include="KSKDServiceStateMachine.h" />
     <ClInclude Include="KSKinectDataService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KinectDataProto.pb.cc" />
+    <ClCompile Include="KSKDServiceStateMachine.cpp" />
     <ClCompile Include="KSKinectDataService.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

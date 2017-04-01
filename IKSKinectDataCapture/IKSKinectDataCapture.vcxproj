@@ -90,7 +90,8 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;..\lib\kinect\x86;..\lib\boost\debug;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Kinect10.lib;KSUtils.lib;KSLogService.lib;</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -119,7 +120,8 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;..\lib\kinect\x86;..\lib\boost\release;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Kinect10.lib;KSUtils.lib;KSLogService.lib;</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

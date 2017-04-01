@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IKSKinectDataService.h"
+#include "KSKDServiceStateMachine.h"
 #include <boost\shared_ptr.hpp>
 
 class IKSSession;
@@ -23,7 +24,7 @@ protected:
 	void ProcessEndReq(const ShareFrame& frame);
 
 private:
-
+	KSKDServiceStateMachinePtr m_StateMachine;
 	IKSSessionPtr m_Session;
 	IKSServicePtr m_Service;
 };

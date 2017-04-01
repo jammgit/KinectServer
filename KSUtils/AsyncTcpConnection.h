@@ -138,7 +138,6 @@ void AsyncTcpConnection<T>::HandleRead(
 	if (err) goto ReadError;
 	else
 	{
-		//printf("接收到[%d]bytes数据\n", rbytes);
 		//buffer被写入多少数据
 		data->SetUsed(rbytes);
 		this->TryParse(data);
@@ -173,37 +172,31 @@ void AsyncTcpConnection<T>::HandleWrite(
 	data->SetUsed(data->Used() + wbytes);
 	if (data->Used() < data->Length())
 	{
-		printf("2async_write_some begin\n");
 		m_Socket->async_write_some(
 			buffer(data->Data() + data->Used(), data->Length() - data->Used()),
 			boost::bind(&AsyncTcpConnection::HandleWrite,
 				this,
 				shared_from_this(), data, _1, _2));
-		printf("2async_write_some end\n");
 		return;
 	}
 	else if (data->Used() == data->Length())
 	{
-		//printf("write success\n");
 		std::lock_guard<std::mutex> lock(m_callingMutex);
 		if (m_dataList.size() > 0)
 		{
 			std::lock_guard<std::mutex> lock(m_dataListMutex);
 			ShareData sData = m_dataList.front();
 			m_dataList.pop_front();
-			printf("1async_write_some begin\n");
 			m_Socket->async_write_some(
 				buffer(sData->Data(), sData->Length()),
 				boost::bind(&AsyncTcpConnection::HandleWrite,
 					this,
 					shared_from_this(), sData, _1, _2));
-			printf("1async_write_some end\n");
 			return;
 		}
 		m_bAsyncWriteCalling = false;
 		return;
 	}
-
 
 WriteError:
 	connPtr->Release();
@@ -225,13 +218,11 @@ void AsyncTcpConnection<T>::SendShareData(const ShareData& data)
 			std::lock_guard<std::mutex> lock(m_dataListMutex);
 			ShareData sData = m_dataList.front();
 			m_dataList.pop_front();
-			printf("0async_write_some begin\n");
 			m_Socket->async_write_some( 
 				buffer(sData->Data(), sData->Length()),
 				boost::bind(&AsyncTcpConnection::HandleWrite,
 					this,
 					shared_from_this(), sData, _1, _2));
-			printf("0async_write_some end\n");
 			m_bAsyncWriteCalling = true;
 		}
 	}

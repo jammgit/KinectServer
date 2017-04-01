@@ -87,7 +87,8 @@
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;../lib/libyuv/;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>KSUtils.lib;KSLogService.lib;IKSKinectH264Encode.lib;yuv.lib;</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -112,7 +113,8 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;../lib/libyuv/;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>KSUtils.lib;KSLogService.lib;IKSKinectH264Encode.lib;yuv.lib;</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

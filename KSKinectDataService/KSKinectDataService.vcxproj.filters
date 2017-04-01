@@ -27,12 +27,18 @@
     <ClInclude Include="KinectDataProto.pb.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="KSKDServiceStateMachine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KSKinectDataService.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="KinectDataProto.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="KSKDServiceStateMachine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

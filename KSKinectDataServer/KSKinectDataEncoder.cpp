@@ -54,6 +54,7 @@ void KSKinectDataEncoder::WorkingFunc()
 	m_bWorkingSwitch = false;
 }
 
+
 bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 {//编码为二进制，发送
 	uint8_t *yuvBuf = NULL;
@@ -84,7 +85,7 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 	{
 		if (yuvBuf)
 		{
-			delete yuvBuf;
+			delete [] yuvBuf;
 			yuvBuf = NULL;
 		}
 	};
@@ -93,6 +94,7 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 	KinectDataCaptureQueuePtr queueptr;
 	CharsetUtils::ANSIStringToUnicodeString(m_deviceName, wname);
 	KinectDataCapturer::GetInstance()->GetDataQueue(wname, queueptr);
+	unsigned int lastFrameNum = 0;
 
 	while (queueptr && m_bWorkingSwitch)
 	{
@@ -101,18 +103,27 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 			Sleep(25);
 			continue;
 		}
-
-		MiddleRgbFramePtr frame;
-
+		// get one frame
+		MiddleRgbFramePtr frame = MiddleRgbFrame::Make(0,0,0,NULL);
+		frame->m_frameNumber = lastFrameNum;
 		bool got;
 		if (color_or_depth) got = queueptr->GetColorFrame(frame);
 		else got = queueptr->GetDepthFrame(frame);
+	
 		if (!got)
 		{
-			bool b = queueptr->IsStopProvideData();
-			if (b) return false; //kinect 断开
-			else continue;
+			//whether device unlink
+			if (queueptr->IsStopProvideData())
+			{
+				releaseBufFunc();
+				m_Sender->DeviceUnlink();
+				return false; //kinect 断开
+			}
+			Sleep(25);
+			continue;
 		}
+
+		lastFrameNum = frame->m_frameNumber;
 
 		if (frame->m_w != m_lastW || frame->m_h != m_lastH)
 		{
@@ -147,13 +158,11 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 					out_linesize[i],
 					out_data[i]);
 
-				
-
 				m_Sender->Send264Frame(encodedFrame);
-
 			}
 		}
 	}
+	releaseBufFunc();
 	return true;
 }
 
@@ -165,17 +174,18 @@ bool KSKinectDataEncoder::EncodeSkeleton()
 	KinectDataCapturer::GetInstance()->GetDataQueue(wname, queueptr);
 	//	bool kinectOff;
 
-	while (queueptr && m_bWorkingSwitch)
-	{
-		SkeletonFramePtr frame;
-		if (!queueptr->GetSkeleFrame(frame))
-		{
-			bool b = queueptr->IsStopProvideData();
-			if (b) return false; //kinect 断开
-		}
+	//while (queueptr && m_bWorkingSwitch)
+	//{
+	//	SkeletonFramePtr frame;
+	//	if (!queueptr->GetSkeleFrame(frame))
+	//	{
+	//		bool b = queueptr->IsStopProvideData();
+	//		if (b) return false; //kinect 断开
+	//	}
 
-		m_Sender->SendSkeletonFrame(frame);
-	}
+	//	m_Sender->SendSkeletonFrame(frame);
+	//}
+
 	return true;
 }
 
@@ -207,6 +217,7 @@ void KSKinectDataEncoder::Release()
 	std::lock_guard<std::mutex> lock(m_EncodeMutex);
 	if (m_pEncoder)
 	{
+		m_pEncoder->Close();
 		delete m_pEncoder;
 		m_pEncoder = NULL;
 	}

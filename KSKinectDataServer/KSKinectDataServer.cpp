@@ -103,8 +103,9 @@ bool KSKinectDataServer::UnRegisterDataSock(
 		auto iter_2 = iter_1->second.find(devname);
 		if (iter_2 != iter_1->second.end())
 		{
-			iter_2->second->Close();
-			iter_1->second[iter_2->first] = NULL;
+			//iter_2->second->Close();
+			iter_1->second.erase(iter_2);
+			//iter_1->second[iter_2->first] = NULL;
 		}
 	}
 	return true;

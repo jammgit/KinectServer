@@ -20,22 +20,6 @@ KSKinectDataSender::~KSKinectDataSender()
 {
 }
 
-
-
-void KSKinectDataSender::Close()
-{
-	AsyncTcpConnection::Release();
-
-	std::lock_guard<std::mutex> lock(m_EncoderMutex);
-	if (m_EncoderPtr)
-	{
-		m_EncoderPtr->Stop();
-		m_EncoderPtr = NULL;
-	}
-}
-
-
-
 void KSKinectDataSender::Send264Frame(Middle264FramePtr frame)
 {
 	ShareData head = DataBuffer::Make(12);
@@ -110,8 +94,6 @@ void KSKinectDataSender::TryParse(const ShareData& data)
 
 void KSKinectDataSender::DeviceUnlink()
 {
-	this->Close();
-
 	std::lock_guard<std::mutex> lock(m_ReleaseMutex);
 	if (!m_StrGuid.empty())
 	{//有可能在没收到指令前就断开了socket
@@ -137,7 +119,16 @@ void KSKinectDataSender::DeviceUnlink()
 void KSKinectDataSender::Release()
 { // 底层socket断开
 
-	this->Close();
+	{
+		std::lock_guard<std::mutex> lock(m_EncoderMutex);
+		if (m_EncoderPtr)
+		{
+			m_EncoderPtr->Stop();
+			m_EncoderPtr = NULL;
+		}
+	}
+
+	AsyncTcpConnection::Release();
 
 	std::lock_guard<std::mutex> lock(m_ReleaseMutex);
 	if (!m_StrGuid.empty())
@@ -161,7 +152,4 @@ void KSKinectDataSender::Release()
 
 }
 
-void KSKinectDataSender::EndProcess()
-{
 
-}
