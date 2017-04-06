@@ -88,9 +88,16 @@ bool KinectDataCaptureQueue::GetSkeleFrame(SkeletonFramePtr& frame)
 		std::lock_guard<std::mutex> lock(m_SkeletonMutex);
 		if (m_SkeletonList.size() > 0)
 		{
-			frame = m_SkeletonList.front();
-			//m_SkeletonList.pop_front();
-			return true;
+			auto iter = m_SkeletonList.begin();
+			for (; iter != m_SkeletonList.end(); ++iter)
+			{
+				if ((*iter)->m_u32FrameNumber > frame->m_u32FrameNumber)
+				{
+					frame = *iter;
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 	return false;

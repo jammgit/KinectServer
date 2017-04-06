@@ -29,9 +29,7 @@ void KSService::WorkingFunc()
 
 void KSService::Stop()
 {
-	AsyncTcpServer::Stop();
-
-	Thread::Stop();
+	IKSService::Stop();
 
 	std::lock_guard<std::mutex> lock(m_MapMutex);
 	m_SessionMap.clear();
@@ -84,6 +82,11 @@ void KSService::ReleaseSession(const std::string& guid)
 
 	}
 
+}
+
+void KSService::RegisterClient(IKSClient *client)
+{
+	KinectDataCapturer::GetInstance()->RegisterClient(client);
 }
 
 

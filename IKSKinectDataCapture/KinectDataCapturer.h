@@ -7,11 +7,15 @@
 #include <mutex>
 #include "../KSUtils/Singleton.h"
 
+class IKDCaptureClient;
+
 //设备名->数据队列
 typedef std::map<std::wstring, KinectDataCaptureQueuePtr> DevName2DataQueueMap;
 //设备名->打开设备所产生的信息
 typedef std::map<std::wstring, KinectDeviceInfoPtr> DevName2DevInfoMap;
 typedef std::list<std::wstring> DeviceNameList;
+
+typedef struct _NUI_SKELETON_DATA NUI_SKELETON_DATA;
 
 class KinectDataCapturer
 	: public Singleton<KinectDataCapturer>
@@ -19,6 +23,9 @@ class KinectDataCapturer
 public:
 	KinectDataCapturer();
 	~KinectDataCapturer();
+
+	void RegisterClient(IKDCaptureClient *client);
+	IKDCaptureClient* m_pClient;
 
 	void RegisterDevStatusCallBack(); //开始设备数据获取
 
@@ -29,7 +36,8 @@ public:
 		KinectDataCaptureQueuePtr &observer);
 
 protected:
-	HRESULT NuiInit(KinectDeviceInfoPtr& device);
+	HRESULT NuiInit(); // init call
+	HRESULT NuiInit(KinectDeviceInfoPtr& device); //call back
 	//HRESULT NuiInit(BSTR instanceName);
 	void NuiUnInit(const wchar_t* uniqueName);
 	//void NuiZero();
@@ -38,6 +46,9 @@ protected:
 	void NuiGotColorAlert(KinectDeviceInfoPtr& device);
 	void NuiGotSkeletonAlert(KinectDeviceInfoPtr& device);
 	RGBQUAD NuiShortToQuadDepth(USHORT s);
+
+protected:
+	void NuiDrawSkeletonSegment(SkeletonFramePtr &frame, NUI_SKELETON_DATA * pSkel, POINT points[20], int numJoints, ...);
 
 protected:
 	static DWORD __stdcall     NuiProcessThread(LPVOID pParam);

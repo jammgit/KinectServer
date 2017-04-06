@@ -2,10 +2,14 @@
 #include "KinectDataConst.h"
 #include "../KSUtils/CharsetUtils.h"
 #include "../KSLogService/KSLogService.h"
+#include "IKDCaptureClient.h"
 
 #include <NuiApi.h>
+#include <vector>
+
 
 KinectDataCapturer::KinectDataCapturer()
+	: m_pClient(NULL)
 {
 }
 
@@ -13,10 +17,19 @@ KinectDataCapturer::~KinectDataCapturer()
 {
 }
 
+void KinectDataCapturer::RegisterClient(IKDCaptureClient *client)
+{
+	m_pClient = client;
+}
+
 void KinectDataCapturer::RegisterDevStatusCallBack()
 {
+	// 设备初始化同步处理
+	std::lock_guard<std::mutex> lock(m_callBackMutex);
 	NuiSetDeviceStatusCallback(
 		&KinectDataCapturer::NuiStatusProcThunk, this);
+
+	this->NuiInit();
 }
 
 void KinectDataCapturer::GetDeviceList(DeviceNameList& devList)
@@ -28,7 +41,7 @@ void KinectDataCapturer::GetDeviceList(DeviceNameList& devList)
 bool KinectDataCapturer::GetDataQueue(
 	const std::wstring& devicename,
 	KinectDataCaptureQueuePtr &observer)
-{
+{ 
 	auto iter = m_DevName2DataQueueMap.find(devicename);
 	if (iter == m_DevName2DataQueueMap.end())
 	{
@@ -48,12 +61,41 @@ void CALLBACK KinectDataCapturer::NuiStatusProcThunk(HRESULT hrStatus, const wch
 	}
 }
 
+HRESULT KinectDataCapturer::NuiInit()
+{
+	HRESULT  hr = S_OK;
+	int idx = 0;
+	while (true)
+	{
+		KinectDeviceInfoPtr devInfo = boost::make_shared<KinectDeviceInfo>();
+		hr = NuiCreateSensorByIndex(idx, &devInfo->m_pNuiSensor);
+		if (FAILED(hr))
+			return hr;
+
+		devInfo->m_instanceName = devInfo->m_pNuiSensor->NuiDeviceConnectionId();
+		hr = this->NuiInit(devInfo);
+		if (FAILED(hr))
+			goto next;
+
+		{
+			std::wstring w(devInfo->m_instanceName);
+			std::string a;
+			CharsetUtils::UnicodeStringToANSIString(w, a);
+			KSLogService::GetInstance()->OutputDevice(a, true);
+		}
+	next:
+		++idx;
+	}
+	return hr;
+}
+
 void CALLBACK KinectDataCapturer::NuiStatusProc(
 	HRESULT hrStatus,
 	const wchar_t* instanceName,
 	const wchar_t* uniqueDeviceName)
 {
-
+	HRESULT hr;
+	std::lock_guard<std::mutex> lock(m_callBackMutex);
 	if (SUCCEEDED(hrStatus))
 	{//连上
 		if (S_OK == hrStatus)
@@ -61,55 +103,38 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 			KinectDeviceInfoPtr devInfo = boost::make_shared<KinectDeviceInfo>();
 			devInfo->m_instanceName = instanceName;
 			devInfo->m_deviceName = uniqueDeviceName;
-			//创建map
-			m_DevName2DevInfoMap[devInfo->m_instanceName] = devInfo;
-			m_DevName2DevInfoMap[devInfo->m_instanceName]->m_pKinectDataCapturer = this;
 
-			HRESULT ret = this->NuiInit(devInfo);
-			if (FAILED(ret))
+
+			if (devInfo->m_instanceName.empty())
+				goto initerror;
+
+			hr = NuiCreateSensorById(devInfo->m_instanceName.c_str(), &devInfo->m_pNuiSensor);
+			if (FAILED(hr))
+				goto initerror;
+
+			devInfo->m_instanceId = devInfo->m_pNuiSensor->NuiDeviceConnectionId();
+
+			hr = this->NuiInit(devInfo);
+			if (FAILED(hr))
+				goto initerror;
+
 			{
-				m_DevName2DevInfoMap[devInfo->m_instanceName] = NULL;
-				return;
+				std::wstring w(instanceName);
+				std::string a;
+				CharsetUtils::UnicodeStringToANSIString(w, a);
+				KSLogService::GetInstance()->OutputDevice(a, true);
 			}
-			m_DevName2DataQueueMap[devInfo->m_instanceName] =
-				boost::make_shared<KinectDataCaptureQueue>();
+			return;
 
-			std::lock_guard<std::mutex> lock(m_ListMutex);
-			m_DevNameList.push_back(instanceName);
-
-			std::wstring w(instanceName);
-			std::string a;
-			CharsetUtils::UnicodeStringToANSIString(w, a);
-			KSLogService::GetInstance()->OutputDevice(a, true);
+		initerror:
+			return;
 		}
 	}
 	else
 	{//断开连接
 		if (instanceName == NULL) return;
 
-		auto mapiter = m_DevName2DevInfoMap.find(instanceName);
-		if (mapiter == m_DevName2DevInfoMap.end())
-			return;
 		NuiUnInit(instanceName);
-		m_DevName2DevInfoMap.erase(mapiter);
-
-		auto datamapiter = m_DevName2DataQueueMap.find(instanceName);
-		if (datamapiter == m_DevName2DataQueueMap.end())
-			return;
-		datamapiter->second->StopProvideData();
-		m_DevName2DataQueueMap.erase(datamapiter);
-
-		std::lock_guard<std::mutex> lock(m_ListMutex);
-		auto iter = m_DevNameList.begin();
-		for each(auto elem in m_DevNameList)
-		{
-			if (wcsncmp(elem.c_str(), instanceName, elem.length()) == 0)
-			{
-				m_DevNameList.erase(iter);
-				break;
-			}
-			++iter;
-		}
 
 		std::wstring w(instanceName);
 		std::string a;
@@ -118,21 +143,10 @@ void CALLBACK KinectDataCapturer::NuiStatusProc(
 	}
 }
 
+
 HRESULT KinectDataCapturer::NuiInit(KinectDeviceInfoPtr& device)
 {
-	if (device->m_instanceName.empty())
-	{
-		return E_FAIL;
-	}
-
-	HRESULT hr = NuiCreateSensorById(device->m_instanceName.c_str(), &device->m_pNuiSensor);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	device->m_instanceId = device->m_pNuiSensor->NuiDeviceConnectionId();
+	HRESULT hr;
 
 	device->m_hNextDepthFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	device->m_hNextColorFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -154,7 +168,8 @@ HRESULT KinectDataCapturer::NuiInit(KinectDeviceInfoPtr& device)
 
 	if (HasSkeletalEngine(device->m_pNuiSensor))
 	{
-		hr = device->m_pNuiSensor->NuiSkeletonTrackingEnable(device->m_hNextSkeletonEvent, 0);
+		hr = device->m_pNuiSensor->NuiSkeletonTrackingEnable(device->m_hNextSkeletonEvent,
+			/*NUI_SKELETON_TRACKING_FLAG_TITLE_SETS_TRACKED_SKELETONS*/0);
 		if (FAILED(hr))
 			return hr;
 	}
@@ -184,13 +199,20 @@ HRESULT KinectDataCapturer::NuiInit(KinectDeviceInfoPtr& device)
 	if (FAILED(hr))
 		return hr;
 
+	//创建map
+	m_DevName2DevInfoMap[device->m_instanceName] = device; //device 是引用形参
+	m_DevName2DevInfoMap[device->m_instanceName]->m_pKinectDataCapturer = this;
+
+	m_DevName2DataQueueMap[device->m_instanceName] =
+		boost::make_shared<KinectDataCaptureQueue>();
+
+	std::lock_guard<std::mutex> lock(m_ListMutex);
+	m_DevNameList.push_back(device->m_instanceName);
+
 	// Start the Nui processing thread
 	device->m_hEvNuiProcessStop = CreateEvent(NULL, FALSE, FALSE, NULL);
-	device->m_hThNuiProcess = CreateThread(NULL, 0, NuiProcessThread, &device/*this*/, 0, NULL);
-
-	//创建队列
-	m_DevName2DataQueueMap[device->m_deviceName] =
-		boost::make_shared<KinectDataCaptureQueue>();
+	device->m_hThNuiProcess = CreateThread(
+		NULL, 0, NuiProcessThread, &m_DevName2DevInfoMap[device->m_instanceName]/*this*/, 0, NULL);
 
 	return hr;
 }
@@ -222,6 +244,7 @@ DWORD WINAPI KinectDataCapturer::NuiProcessThread(KinectDeviceInfoPtr infoPtr)
 		// Process signal events
 		switch (nEventIdx)
 		{
+
 		case WAIT_TIMEOUT:
 			continue;
 
@@ -359,9 +382,7 @@ void KinectDataCapturer::NuiGotSkeletonAlert(KinectDeviceInfoPtr& device)
 	{
 		for (int i = 0; i < NUI_SKELETON_COUNT; i++)
 		{
-			if (SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED ||
-				(SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_POSITION_ONLY
-					&& device->m_bAppTracking))
+			if (SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED)
 			{
 				bFoundSkeleton = true;
 			}
@@ -381,12 +402,8 @@ void KinectDataCapturer::NuiGotSkeletonAlert(KinectDeviceInfoPtr& device)
 		return;
 	}
 
-	// we found a skeleton, re-start the skeletal timer
-	device->m_bScreenBlanked = false;
-	//m_LastSkeletonFoundTime = timeGetTime();
-
-	// draw each skeleton color according to the slot within they are found.
-	//Nui_BlankSkeletonScreen(GetDlgItem(m_hWnd, IDC_SKELETALVIEW), false);
+	SkeletonFramePtr sFrame = SkeletonFrame::Make(
+		SkeletonFrame.dwFrameNumber, 320, 240);
 
 	bool bSkeletonIdsChanged = false;
 	for (int i = 0; i < NUI_SKELETON_COUNT; i++)
@@ -401,20 +418,118 @@ void KinectDataCapturer::NuiGotSkeletonAlert(KinectDeviceInfoPtr& device)
 		if (SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED &&
 			SkeletonFrame.SkeletonData[i].eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SHOULDER_CENTER] != NUI_SKELETON_POSITION_NOT_TRACKED)
 		{
-			//Nui_DrawSkeleton(&SkeletonFrame.SkeletonData[i], GetDlgItem(m_hWnd, IDC_SKELETALVIEW), i);
-		}
-		else if (device->m_bAppTracking && SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_POSITION_ONLY)
-		{
-			//Nui_DrawSkeletonId(&SkeletonFrame.SkeletonData[i], GetDlgItem(m_hWnd, IDC_SKELETALVIEW), i);
+			USHORT depth;
+			POINT point[20] = { 0 };
+			for (int j = 0; j < NUI_SKELETON_POSITION_COUNT; j++)
+				NuiTransformSkeletonToDepthImage(SkeletonFrame.SkeletonData[i].SkeletonPositions[j], &point[j].x, &point[j].y, &depth);
+			
+			if ((point[0].y >= point[1].y)
+				&& (point[1].y >= point[2].y)
+				&& (point[2].y >= point[3].y))
+			{
+			}
+			else
+			{
+				printf("Not sequence\n");
+			}
+
+			NuiDrawSkeletonSegment(sFrame, &SkeletonFrame.SkeletonData[i], point,4, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_HEAD);
+			NuiDrawSkeletonSegment(sFrame, &SkeletonFrame.SkeletonData[i], point,5, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT, NUI_SKELETON_POSITION_ELBOW_LEFT, NUI_SKELETON_POSITION_WRIST_LEFT, NUI_SKELETON_POSITION_HAND_LEFT);
+			NuiDrawSkeletonSegment(sFrame, &SkeletonFrame.SkeletonData[i], point,5, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_RIGHT, NUI_SKELETON_POSITION_ELBOW_RIGHT, NUI_SKELETON_POSITION_WRIST_RIGHT, NUI_SKELETON_POSITION_HAND_RIGHT);
+			NuiDrawSkeletonSegment(sFrame, &SkeletonFrame.SkeletonData[i], point,5, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_KNEE_LEFT, NUI_SKELETON_POSITION_ANKLE_LEFT, NUI_SKELETON_POSITION_FOOT_LEFT);
+			NuiDrawSkeletonSegment(sFrame, &SkeletonFrame.SkeletonData[i], point,5, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
 		}
 	}
 
-	//if (bSkeletonIdsChanged)
-	//{
-	//	UpdateTrackingComboBoxes();
-	//}
+	if (m_pClient && 
+		(sFrame->m_SkelePointCount == 24
+			|| sFrame->m_SkelePointCount == 48))
+	{
+		std::vector<POINT> pvec;
+		SkelePoint* ps = sFrame->m_SkelePoints;
+		for (int i = 0; i < sFrame->m_SkelePointCount; ++i)
+		{
+			POINT p;
+			p.x = (ps+i)->x;
+			p.y = (ps+i)->y;
+			pvec.push_back(p);
+		}
+		if (m_pClient)
+			m_pClient->DrawLine(pvec);
+	}
+	
+	m_DevName2DataQueueMap[device->m_instanceName]->RenewSkeleFrame(sFrame);
 
-	//Nui_DoDoubleBuffer(GetDlgItem(m_hWnd, IDC_SKELETALVIEW), m_SkeletonDC);
+}
+
+
+void KinectDataCapturer::NuiDrawSkeletonSegment(
+	SkeletonFramePtr &frame, 
+	NUI_SKELETON_DATA * pSkel,
+	POINT points[20], 
+	int numJoints, ...)
+{
+	va_list vl;
+	va_start(vl, numJoints);
+
+	POINT segmentPositions[NUI_SKELETON_POSITION_COUNT];
+	int segmentPositionsCount = 0;
+
+	DWORD polylinePointCounts[NUI_SKELETON_POSITION_COUNT];
+	int numPolylines = 0;
+	int currentPointCount = 0;
+
+	// Note the loop condition: We intentionally run one iteration beyond the
+	// last element in the joint list, so we can properly end the final polyline.
+	for (int iJoint = 0; iJoint <= numJoints; iJoint++)
+	{
+		if (iJoint < numJoints)
+		{
+			NUI_SKELETON_POSITION_INDEX jointIndex = va_arg(vl, NUI_SKELETON_POSITION_INDEX);
+
+			if (pSkel->eSkeletonPositionTrackingState[jointIndex] != NUI_SKELETON_POSITION_NOT_TRACKED)
+			{
+				// This joint is tracked: add it to the array of segment positions.        
+				segmentPositions[segmentPositionsCount] = points[jointIndex];
+				segmentPositionsCount++;
+				currentPointCount++;
+
+				// Fully processed the current joint; move on to the next one
+				continue;
+			}
+			else
+			{
+				//printf("Not tracked one joint\n");
+			}
+		}
+		// If we fall through to here, we're either beyond the last joint, or
+		// the current joint is not tracked: end the current polyline here.
+		if (currentPointCount > 1)
+		{
+			// Current polyline already has at least two points: save the count.
+			polylinePointCounts[numPolylines++] = currentPointCount;
+		}
+		else if (currentPointCount == 1)
+		{
+			// Current polyline has only one point: ignore it.
+			segmentPositionsCount--;
+		}
+		currentPointCount = 0;
+	}
+
+
+	if (numPolylines > 0)
+	{
+		frame->m_PolyLinesArr[frame->m_PolyLinesArrCount++] = segmentPositionsCount;
+		for (int i = 0; i < segmentPositionsCount; ++i)
+		{
+			frame->m_SkelePoints[frame->m_SkelePointCount].x = (unsigned short)segmentPositions[i].x;
+			frame->m_SkelePoints[frame->m_SkelePointCount].y = (unsigned short)segmentPositions[i].y;
+			
+			frame->m_SkelePointCount++;
+		}
+	}
+	va_end(vl);
 }
 
 RGBQUAD KinectDataCapturer::NuiShortToQuadDepth(USHORT s)
@@ -484,8 +599,27 @@ void KinectDataCapturer::NuiUnInit(const wchar_t* uniqueName)
 		info->m_pNuiSensor = NULL;
 	}
 
-	//m_DevName2DevInfoMap[uniqueName] = NULL;
-	//service capture 可能拥有此智能指针，调用此函数告知设备断开
-	//m_DevName2DataQueueMap[uniqueName]->StopProvideData();
-	//m_DevName2DataQueueMap[uniqueName] = NULL; //service capture 后面陆续会删除智能指针
+	// 删除信息
+	auto mapiter = m_DevName2DevInfoMap.find(uniqueName);
+	if (mapiter == m_DevName2DevInfoMap.end())
+		return;
+	m_DevName2DevInfoMap.erase(mapiter);
+
+	auto datamapiter = m_DevName2DataQueueMap.find(uniqueName);
+	if (datamapiter == m_DevName2DataQueueMap.end())
+		return;
+	datamapiter->second->StopProvideData();
+	m_DevName2DataQueueMap.erase(datamapiter);
+
+	std::lock_guard<std::mutex> lock(m_ListMutex);
+	auto iter = m_DevNameList.begin();
+	for each(auto elem in m_DevNameList)
+	{
+		if (wcsncmp(elem.c_str(), uniqueName, elem.length()) == 0)
+		{
+			m_DevNameList.erase(iter);
+			break;
+		}
+		++iter;
+	}
 }

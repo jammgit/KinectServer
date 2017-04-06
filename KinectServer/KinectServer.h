@@ -4,14 +4,21 @@
 #include <QtWidgets/QMainWindow>
 #include <QPoint>
 #include "ui_KinectServer.h"
-#include "../KSService/KSService.h"
+#include "KSSysTray.h"
 #include "../KSLogService/IKSLogClient.h"
+#include "../KSService/IKSClient.h"
+#include <list>
+#include <boost\shared_ptr.hpp>
+
+class IKSService;
+typedef boost::shared_ptr<IKSService> IKSServicePtr;
 
 class QMouseEvent;
 
 class KinectServer
 	: public QMainWindow
 	, public IKSLogClient
+	, public IKSClient
 {
 	Q_OBJECT
 
@@ -22,10 +29,17 @@ public:
 	void mouseMoveEvent(QMouseEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 	void mouseReleaseEvent(QMouseEvent *event) override;
+	void paintEvent(QPaintEvent *) override;
 
 protected:
 	void InitWidget();
+	void InitStyle();
 	void InitConnect();
+
+signals:
+	void DrawLine(std::vector<POINT> points) override;
+	public slots:
+	void slot_DrawLine(std::vector<POINT> points);
 
 signals:
 	void OutputString(const char* msg) override;
@@ -40,12 +54,19 @@ signals:
 
 	private slots:
 	void slot_close();
+	void slot_anim_finish();
 
 private:
 	Ui::KinectServerClass ui;
 
-	KSServicePtr m_servicePtr;
+	IKSServicePtr m_ServicePtr;
 	QPoint m_position;
+
+	KSSysTray m_SysTray;
+	int w, h;
+private:
+	std::list<std::vector<POINT>> m_pvec;
+
 };
 
 #endif // KINECTSERVER_H

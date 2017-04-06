@@ -52,9 +52,52 @@ void KSKinectDataSender::Send264Frame(Middle264FramePtr frame)
 void KSKinectDataSender::SendSkeletonFrame(SkeletonFramePtr frame)
 {
 
+	frame->m_u32Length = 
+		sizeof(frame->m_u16Width) + sizeof(frame->m_u16Height)
+		+ sizeof(char) + sizeof(char)*frame->m_PolyLinesArrCount
+		+ sizeof(SkelePoint)*frame->m_SkelePointCount;
+	frame->m_u32FrameType = KSKinectDataEncoder::SRC_TYPE_SKELETON;
+	
+	ShareData data = DataBuffer::Make(12 + frame->m_u32Length);
+	data->m_data[0] = frame->m_FrameNumber[3];
+	data->m_data[1] = frame->m_FrameNumber[2];
+	data->m_data[2] = frame->m_FrameNumber[1];
+	data->m_data[3] = frame->m_FrameNumber[0];
+
+	data->m_data[4] = frame->m_FrameType[3];
+	data->m_data[5] = frame->m_FrameType[2];
+	data->m_data[6] = frame->m_FrameType[1];
+	data->m_data[7] = frame->m_FrameType[0];
+
+	data->m_data[8] = frame->m_Length[3];
+	data->m_data[9] = frame->m_Length[2];
+	data->m_data[10] = frame->m_Length[1];
+	data->m_data[11] = frame->m_Length[0];
+
+	data->m_data[12] = frame->m_Width[1];
+	data->m_data[13] = frame->m_Width[0];
+	data->m_data[14] = frame->m_Height[1];
+	data->m_data[15] = frame->m_Height[0];
+	data->m_data[16] = (unsigned char)frame->m_PolyLinesArrCount;
+	for (int i = 0; i < frame->m_PolyLinesArrCount; ++i)
+		data->m_data[17 + i] = frame->m_PolyLinesArr[i];
+
+	for (int j = 0; j < frame->m_SkelePointCount; ++j)
+	{
+		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 0] = frame->m_SkelePoints[j].cx[1];
+		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 1] = frame->m_SkelePoints[j].cx[0];
+		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 2] = frame->m_SkelePoints[j].cy[1];
+		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 3] = frame->m_SkelePoints[j].cy[0];
+
+	//	if (frame->m_SkelePoints[j].x >= 320 || frame->m_SkelePoints[j].y >= 240)
+		printf("{x=%d,y=%d} ", frame->m_SkelePoints[j].x, frame->m_SkelePoints[j].y);
+
+	}
+	//printf("\n");
+	//printf("%d\n", frame->m_SkelePointCount);
+	//printf("----------------------------------------------------------\n");
+	SendShareData(data);
 }
-
-
 
 void KSKinectDataSender::TryParse(const ShareData& data)
 {

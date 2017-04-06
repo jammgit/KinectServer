@@ -1,10 +1,11 @@
 #pragma once
 
 
-#include "../KSUtils/Thread.h"
+
 #include "../KSUtils/Singleton.h"
 #include "IKSService.h"
 #include "KSSession.h"
+#include "IKSClient.h"
 #include <mutex>
 #include <string>
 #include <map>
@@ -21,12 +22,13 @@ typedef std::map<StrGUID, KSSessionPtr> KSSessionMap;
 
 class KSService
 	: public IKSService
-	, public Thread
 	, public Singleton<KSService>
 {
 public:
 	KSService();
 	~KSService();
+
+	void RegisterClient(IKSClient *client);
 
 	KSKinectDataServerPtr GetColorServerPtr() override;
 	KSKinectDataServerPtr GetDepthServerPtr() override;

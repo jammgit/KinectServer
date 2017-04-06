@@ -5,5 +5,7 @@
         <file>Resources/bg_3.png</file>
         <file>Resources/bg_4.png</file>
         <file>Resources/close.png</file>
+        <file>Resources/close_2.png</file>
+        <file>Resources/icon.png</file>
     </qresource>
 </RCC>

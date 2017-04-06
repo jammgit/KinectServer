@@ -60,6 +60,9 @@ void AsyncTcpServer<T>::Start()
 	m_pService = new io_service;
 	m_pEndPoint = new ip::tcp::endpoint(ip::tcp::v4(), m_Port);
 	m_pAcceptor = new ip::tcp::acceptor(*m_pService, *m_pEndPoint);
+	//boost::asio::ip::tcp::acceptor::reuse_address r(false);
+	//boost::system::error_code err;
+	//m_pAcceptor->set_option(r, err);
 
 	socket_ptr sock(new ip::tcp::socket(*m_pService));
 	m_pAcceptor->async_accept(

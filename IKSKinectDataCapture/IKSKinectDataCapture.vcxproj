@@ -145,6 +145,7 @@
     <ClInclude Include="DepthFrame.h" />
     <ClInclude Include="EncodedColorFrame.h" />
     <ClInclude Include="EncodedDepthFrame.h" />
+    <ClInclude Include="IKDCaptureClient.h" />
     <ClInclude Include="KinectDataCaptureQueue.h" />
     <ClInclude Include="KinectDataCapturer.h" />
     <ClInclude Include="KinectDataConst.h" />

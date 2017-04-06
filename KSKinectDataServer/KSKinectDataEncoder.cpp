@@ -154,7 +154,8 @@ bool KSKinectDataEncoder::EncodeRgb(bool color_or_depth)
 			{
 				Middle264FramePtr encodedFrame = EncodedColorFrame::Make(
 					frame->m_frameNumber,
-					KSKinectDataEncoder::SRC_TYPE_COLOR,
+					(color_or_depth?
+						KSKinectDataEncoder::SRC_TYPE_COLOR: KSKinectDataEncoder::SRC_TYPE_DEPTH),
 					out_linesize[i],
 					out_data[i]);
 
@@ -172,19 +173,36 @@ bool KSKinectDataEncoder::EncodeSkeleton()
 	KinectDataCaptureQueuePtr queueptr;
 	CharsetUtils::ANSIStringToUnicodeString(m_deviceName, wname);
 	KinectDataCapturer::GetInstance()->GetDataQueue(wname, queueptr);
-	//	bool kinectOff;
+	unsigned int lastFrameNum = 0;
 
-	//while (queueptr && m_bWorkingSwitch)
-	//{
-	//	SkeletonFramePtr frame;
-	//	if (!queueptr->GetSkeleFrame(frame))
-	//	{
-	//		bool b = queueptr->IsStopProvideData();
-	//		if (b) return false; //kinect ¶Ï¿ª
-	//	}
+	while (queueptr && m_bWorkingSwitch)
+	{
+		if (m_Sender->GetDataQueueSize() >= MAX_QUEUE_SIZE)
+		{
+			Sleep(25);
+			continue;
+		}
+		// get one frame
+		SkeletonFramePtr frame = SkeletonFrame::Make(0, 0, 0);
+		frame->m_u32FrameNumber = lastFrameNum;
+		bool got = queueptr->GetSkeleFrame(frame);
 
-	//	m_Sender->SendSkeletonFrame(frame);
-	//}
+		if (!got)
+		{
+			//whether device unlink
+			if (queueptr->IsStopProvideData())
+			{
+				m_Sender->DeviceUnlink();
+				return false; //kinect ¶Ï¿ª
+			}
+			Sleep(25);
+			continue;
+		}
+
+		lastFrameNum = frame->m_u32FrameNumber;
+
+		m_Sender->SendSkeletonFrame(frame);
+	}
 
 	return true;
 }

@@ -23,8 +23,8 @@ public:
 		, m_hNextSkeletonEvent(NULL)
 		, m_pVideoStreamHandle(NULL)
 		, m_pDepthStreamHandle(NULL)
-		, m_bScreenBlanked(false)
-		, m_bAppTracking(false)
+		//, m_bScreenBlanked(false)
+		//, m_bAppTracking(false)
 	{}
 	KinectDataCapturer *m_pKinectDataCapturer;
 	// Current kinect
@@ -47,7 +47,7 @@ public:
 
 	RGBQUAD m_rgbWk[640 * 480];
 
-	bool m_bScreenBlanked;
-	bool m_bAppTracking;
+	//bool m_bScreenBlanked;
+	//bool m_bAppTracking;
 	DWORD m_SkeletonIds[6];
 };

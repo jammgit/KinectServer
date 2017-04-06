@@ -48,6 +48,9 @@
     <ClInclude Include="Basic264Frame.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="IKDCaptureClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KinectDataCapturer.cpp">

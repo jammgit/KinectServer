@@ -148,6 +148,7 @@
     <ClCompile Include="ShareData.cpp" />
     <ClCompile Include="ShareFrame.cpp" />
     <ClCompile Include="SocketAddress.cpp" />
+    <ClCompile Include="SysConfig.cpp" />
     <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +162,7 @@
     <ClInclude Include="ShareFrame.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="SocketAddress.h" />
+    <ClInclude Include="SysConfig.h" />
     <ClInclude Include="Thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
