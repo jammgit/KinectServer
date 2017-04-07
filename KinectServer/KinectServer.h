@@ -7,6 +7,7 @@
 #include "KSSysTray.h"
 #include "../KSLogService/IKSLogClient.h"
 #include "../KSService/IKSClient.h"
+#include "../KSUtils/NetworkMonitor.h"
 #include <list>
 #include <boost\shared_ptr.hpp>
 
@@ -19,6 +20,7 @@ class KinectServer
 	: public QMainWindow
 	, public IKSLogClient
 	, public IKSClient
+	, public INetworkClient
 {
 	Q_OBJECT
 
@@ -35,6 +37,11 @@ protected:
 	void InitWidget();
 	void InitStyle();
 	void InitConnect();
+
+signals:
+	void NetworkInfo(double quality, std::string ssid, std::string ip) override;
+	public slots:
+	void slot_NetworkInfo(double quality, std::string ssid, std::string ip);
 
 signals:
 	void DrawLine(std::vector<POINT> points) override;
@@ -58,7 +65,7 @@ signals:
 
 private:
 	Ui::KinectServerClass ui;
-
+	NetworkMonitorPtr m_NetMonitor;
 	IKSServicePtr m_ServicePtr;
 	QPoint m_position;
 

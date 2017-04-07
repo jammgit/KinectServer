@@ -9,11 +9,14 @@ typedef boost::shared_ptr<IKSKinectDataService> IKSKinectDataServicePtr;
 class IKSSession
 	: public AsyncTcpConnection<IKSSession>
 {
+	friend class AsyncTcpConnection<IKSSession>;
+
 public:
 	enum
 	{
 		CMD_TYPE_CONNECT = 0x01,
-		CMD_TYPE_KINECT = 0X02,
+		CMD_TYPE_KINECT = 0x02,
+		CMD_TYPE_PING = 0x63,
 	};
 
 	enum
@@ -29,6 +32,9 @@ public:
 		CMD_NUM_CLI_DEVICES_REQ = 3,
 		CMD_NUM_SVR_CONN_RESP = 100,
 		CMD_NUM_SVR_DEVICES_RESP = 101,
+
+		CMD_NUM_CLI_PING = 1,
+		CMD_NUM_SVR_PING = 100,
 	};
 
 public:
@@ -43,4 +49,8 @@ public:
 
 	virtual void SendShareFrame(ShareFrame frame) = 0;
 
+protected:
+	void TryParse(const ShareData& data) override {};
+	void KeepAliveHandler(const boost::system::error_code &) override {};
+	void Release() override { AsyncTcpConnection::Release(); };
 };

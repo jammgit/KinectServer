@@ -23,6 +23,8 @@ class KSKinectDataServer
 	: public AsyncTcpServer<KSKinectDataServer>
 	, public Thread
 {
+	friend class AsyncTcpServer<KSKinectDataServer>;
+
 public:
 	KSKinectDataServer(unsigned short port);
 	~KSKinectDataServer();
@@ -52,7 +54,7 @@ public:
 		const StrGUID& guid,
 		const std::string& devname);
 
-//protected:
+protected:
 	void WorkingFunc() override;
 	void CreateConnection(socket_ptr sock) override;
 

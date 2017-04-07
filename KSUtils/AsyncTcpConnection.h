@@ -43,15 +43,23 @@ protected:
 		const boost::system::error_code& err,
 		std::size_t wbytes);
 
-public: //模板不支持protected属性的继承，应是protected成员
+	void SendShareData(const ShareData& data);
+
+protected: 
 	virtual void TryParse(const ShareData& data) {};
-	virtual void SendShareData(const ShareData& data);
+	virtual void KeepAliveHandler(const boost::system::error_code &) {};
 	virtual void Release();
+protected:
+	static void KeepAliveCallBack(
+		const boost::system::error_code &, boost::shared_ptr<T> );
 
 protected:
 	const int READ_BUF_LEN = 1024;
-	socket_ptr m_Socket;
+	const int KEEP_ALIVE_MS = 30000;
 
+	socket_ptr m_Socket;
+	boost::asio::deadline_timer m_tPing;
+	
 	//防止连续呼叫回调导致数据乱序
 	bool m_bFirstTimeRead;
 	std::mutex m_callingMutex;
@@ -67,6 +75,7 @@ protected:
 template <class T>
 AsyncTcpConnection<T>::AsyncTcpConnection(socket_ptr sock)
 	: m_Socket(sock)
+	, m_tPing(sock->get_io_service(), boost::posix_time::milliseconds(KEEP_ALIVE_MS))
 	, m_bFirstTimeRead(true)
 	, m_bAsyncWriteCalling(false)
 {
@@ -124,8 +133,19 @@ void AsyncTcpConnection<T>::DoRead()
 				this,
 				shared_from_this(),
 				sData, _1, _2));
+
+		m_tPing.async_wait(boost::bind(&AsyncTcpConnection::KeepAliveCallBack, _1, shared_from_this()));
+
 		m_bFirstTimeRead = false;
 	}
+}
+
+template <class T>
+void AsyncTcpConnection<T>::KeepAliveCallBack(
+	const boost::system::error_code &err, boost::shared_ptr<T> connPtr)
+{
+	if (connPtr)
+		connPtr->KeepAliveHandler(err);
 }
 
 template <class T>
@@ -155,7 +175,7 @@ void AsyncTcpConnection<T>::HandleRead(
 		return;
 	}
 
-ReadError: // sock error, how to close.
+ReadError: 
 	connPtr->Release();
 }
 
@@ -233,7 +253,12 @@ void AsyncTcpConnection<T>::Release()
 {
 	if (m_Socket)
 	{
-		m_Socket->close();
-		m_Socket = NULL;
+		boost::system::error_code err;
+		m_Socket->cancel(err); 
+		m_Socket->close(err);
+		//m_Socket = NULL; 不能置为NULL,HandleRead还在使用，后面它返回错误
 	}
+	boost::system::error_code err;
+	m_tPing.cancel(err);
+	
 }

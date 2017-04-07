@@ -69,7 +69,6 @@ void ProtocProcess::TryParse(const ShareData& data, std::vector<ShareFrame>& fra
 			{
 				m_DataLen = 0;
 				m_Status = WAIT_CMD_DATA;
-				printf("包体长度[%d]bytes\n", m_Frame.m_u32length);
 				m_Frame.m_data = new unsigned char[m_Frame.m_u32length]{ 0 };
 			}
 			else

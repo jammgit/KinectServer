@@ -37,7 +37,7 @@ public:
 	void ReleaseSession(const std::string& guid) override;
 	void Stop() override;
 
-//protected:
+protected:
 	void CreateConnection(socket_ptr sock) override;
 
 protected:

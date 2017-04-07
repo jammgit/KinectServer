@@ -3,7 +3,7 @@
 #include "DataChannelProto.pb.h"
 #include "../KSUtils/ShareData.h"
 #include "../KSService/IKSSession.h"
-#include "../KSKinectDataService/IKSKinectDataService.h"
+#include "../KSLogService/KSLogService.h"
 
 KSKinectDataSender::KSKinectDataSender(
 	KSKinectDataServerPtr server,
@@ -88,14 +88,7 @@ void KSKinectDataSender::SendSkeletonFrame(SkeletonFramePtr frame)
 		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 1] = frame->m_SkelePoints[j].cx[0];
 		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 2] = frame->m_SkelePoints[j].cy[1];
 		data->m_data[17 + frame->m_PolyLinesArrCount + j*4 + 3] = frame->m_SkelePoints[j].cy[0];
-
-	//	if (frame->m_SkelePoints[j].x >= 320 || frame->m_SkelePoints[j].y >= 240)
-		printf("{x=%d,y=%d} ", frame->m_SkelePoints[j].x, frame->m_SkelePoints[j].y);
-
 	}
-	//printf("\n");
-	//printf("%d\n", frame->m_SkelePointCount);
-	//printf("----------------------------------------------------------\n");
 	SendShareData(data);
 }
 
@@ -135,45 +128,41 @@ void KSKinectDataSender::TryParse(const ShareData& data)
 	}
 }
 
+void KSKinectDataSender::Close()
+{
+	AsyncTcpConnection::Release();
+}
+
 void KSKinectDataSender::DeviceUnlink()
 {
-	std::lock_guard<std::mutex> lock(m_ReleaseMutex);
-	if (!m_StrGuid.empty())
-	{//有可能在没收到指令前就断开了socket
-		if (m_Server)
-		{
-			IKSSessionPtr cmdSock;
-			if (m_Server->GetCmdSock(m_StrGuid, cmdSock))
-			{
-				IKSKinectDataServicePtr kdService
-					= cmdSock->KinectDataService();
-				if (kdService)
-					kdService->SendEnd(
-						IKSKinectDataService::ERR_DEVICE,
-						this->m_DevName);
+	std::lock_guard<std::mutex> lock(m_EncoderMutex);
+	std::lock_guard<std::mutex> lock_1(m_ReleaseMutex);
 
-				m_StrGuid.clear();
-			}
+	this->SendEnd(IKSKinectDataService::ERR_DEVICE);
 
-		}
-	}
+	KSLogService::GetInstance()->OutputMessage(m_DevName + ":设备断开");
 }
 
 void KSKinectDataSender::Release()
 { // 底层socket断开
 
+	std::lock_guard<std::mutex> lock(m_EncoderMutex);
+	if (m_EncoderPtr)
 	{
-		std::lock_guard<std::mutex> lock(m_EncoderMutex);
-		if (m_EncoderPtr)
-		{
-			m_EncoderPtr->Stop();
-			m_EncoderPtr = NULL;
-		}
+		m_EncoderPtr->Stop();
+		m_EncoderPtr = NULL;
 	}
 
 	AsyncTcpConnection::Release();
 
-	std::lock_guard<std::mutex> lock(m_ReleaseMutex);
+	std::lock_guard<std::mutex> lock_1(m_ReleaseMutex);
+	this->SendEnd(IKSKinectDataService::ERR_SOCKET);
+	KSLogService::GetInstance()->OutputMessage("数据套接字断开");
+
+}
+
+void KSKinectDataSender::SendEnd(IKSKinectDataService::eSvrEndType type)
+{
 	if (!m_StrGuid.empty())
 	{//有可能在没收到指令前就断开了socket
 		if (m_Server)
@@ -185,14 +174,13 @@ void KSKinectDataSender::Release()
 					= cmdSock->KinectDataService();
 				if (kdService)
 					kdService->SendEnd(
-						IKSKinectDataService::ERR_SOCKET,
+						type,
 						this->m_DevName);
 
 				m_StrGuid.clear();
 			}
 		}
 	}
-
 }
 
 

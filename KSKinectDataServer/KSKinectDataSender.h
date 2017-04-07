@@ -7,6 +7,8 @@
 #include "../IKSKinectDataCapture/EncodedDepthFrame.h"
 #include "../IKSKinectDataCapture/SkeletonFrame.h"
 #include "KSKinectDataEncoder.h"
+#include "../KSKinectDataService/IKSKinectDataService.h"
+
 #include <mutex>
 
 using StrGUID = std::string;
@@ -23,6 +25,8 @@ typedef boost::shared_ptr<KSKinectDataSender> KSKinectDataSenderPtr;
 class KSKinectDataSender
 	: public AsyncTcpConnection<KSKinectDataSender>
 {
+	friend class AsyncTcpConnection<KSKinectDataSender>;
+
 	typedef enum
 	{
 		CMD_TYPE_DATA_CHANNEL = 3,
@@ -42,14 +46,16 @@ public:
 	void SendSkeletonFrame(SkeletonFramePtr frame);
 	void DeviceUnlink();
 
-	
+	void Close();
 
-//protected:
+protected:
+	void SendShareFrame(ShareFrame frame) override {};
 	void TryParse(const ShareData& data) override;
-	void SendShareFrame(ShareFrame frame) {};
+	void KeepAliveHandler(const boost::system::error_code &) override {};
 	void Release() override;
 
-
+protected:
+	inline void SendEnd(IKSKinectDataService::eSvrEndType type);
 
 private:
 	KSKinectDataServerPtr m_Server;

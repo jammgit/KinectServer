@@ -2,6 +2,8 @@
 #include "../KSLogService/KSLogService.h"
 #include "../KSService/KSService.h"
 #include "../KSUtils/SysConfig.h"
+#include "../KSUtils/PortsMacro.h"
+
 #include <QMouseEvent>
 #include <QDesktopWidget>
 #include <QTextEdit>
@@ -29,6 +31,9 @@ KinectServer::KinectServer(QWidget *parent)
 	this->InitConnect();
 
 
+	m_NetMonitor = boost::make_shared<NetworkMonitor>();
+	m_NetMonitor->RegisterClient(this);
+	m_NetMonitor->Start();
 	SysConfig::InitConfig();
 	KSLogService::GetInstance()->RegisterClient(this);
 	//m_ServicePtr->RegisterClient(this);
@@ -129,7 +134,6 @@ void KinectServer::InitWidget()
 	//QRect deskRect = QApplication::desktop()->availableGeometry();
 	//QRect rect = this->geometry();
 	//this->move((deskRect.width() - rect.width()) / 2, deskRect.height() - rect.height());
-
 }
 
 void KinectServer::InitStyle()
@@ -298,6 +302,9 @@ void KinectServer::InitStyle()
 
 void KinectServer::InitConnect()
 {
+	QObject::connect(this, SIGNAL(NetworkInfo(double, std::string, std::string)),
+		this, SLOT(slot_NetworkInfo(double, std::string, std::string)));
+
 	QObject::connect(this, SIGNAL(DrawLine(std::vector<POINT>)), 
 		this, SLOT(slot_DrawLine(std::vector<POINT>)));
 
@@ -305,6 +312,49 @@ void KinectServer::InitConnect()
 	QObject::connect(this, SIGNAL(OutputString(const std::string&)), this, SLOT(slot_OutputString(const std::string&)));
 	QObject::connect(this, SIGNAL(OutputDevice(const std::string&, bool)), this, SLOT(slot_OutputDevice(const std::string&, bool)));
 	QObject::connect(this, SIGNAL(OutputClient(const std::string&, bool)), this, SLOT(slot_OutputClient(const std::string&, bool)));
+}
+
+void KinectServer::slot_NetworkInfo(double quality, std::string ssid, std::string ip)
+{
+	static std::string lastip;
+
+	if ((quality - 0) < 0.000001)
+	{
+		ui.label->setPixmap(QPixmap(":/KinectServer/Resources/no_signal.png"));
+		ui.label_2->setText("No signal");
+		lastip = "";
+		ui.lineEdit->setText("0000 0000 0000");
+		return;
+	}
+	else if (quality < 0.25)
+	{
+		ui.label->setPixmap(QPixmap(":/KinectServer/Resources/low_signal.png"));
+	}
+	else if (quality < 0.5)
+	{
+		ui.label->setPixmap(QPixmap(":/KinectServer/Resources/middle_signal.png"));
+	}
+	else if (quality < 0.75)
+	{
+		ui.label->setPixmap(QPixmap(":/KinectServer/Resources/high_signal.png"));
+	}
+	else if (quality <= 1)
+	{
+		ui.label->setPixmap(QPixmap(":/KinectServer/Resources/good_signal.png"));
+	}
+	ui.label_2->setText(QString::fromLocal8Bit(ssid.c_str()));
+
+	if (lastip != ip)
+	{
+		unsigned long uip = inet_addr(ip.c_str());
+		QString fip = QString::number(htonl(uip), 16);
+		QString fport = QString::number(htons(PORT_KSSERVICE), 16);
+		fip.insert(4, " ");
+		fip.append(" ");
+		fip.append(fport);
+		ui.lineEdit->setText(fip.toUpper());
+		lastip = ip;
+	}
 }
 
 void KinectServer::slot_DrawLine(std::vector<POINT> points)
@@ -333,7 +383,9 @@ void KinectServer::slot_OutputDevice(const std::string& dev, bool connect)
 {
 	if (connect)
 	{
-		ui.listWidget->addItem(QString::fromStdString(dev));
+		QListWidgetItem *item = new QListWidgetItem(QString::fromStdString(dev));
+		item->setToolTip(QString::fromStdString(dev));
+		ui.listWidget->addItem(item);
 	}
 	else
 	{
@@ -354,7 +406,9 @@ void KinectServer::slot_OutputClient(const std::string& addr, bool connect)
 {
 	if (connect)
 	{
-		ui.listWidget_2->addItem(QString::fromStdString(addr));
+		QListWidgetItem *item = new QListWidgetItem(QString::fromStdString(addr));
+		item->setToolTip(QString::fromStdString(addr));
+		ui.listWidget_2->addItem(item);
 	}
 	else
 	{

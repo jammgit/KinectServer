@@ -38,4 +38,6 @@ public:
 	virtual KSKinectDataServerPtr GetDepthServerPtr() = 0;
 	virtual KSKinectDataServerPtr GetSkeleServerPtr() = 0;
 	virtual void RegisterClient(IKSClient *client) = 0;
+
+
 };

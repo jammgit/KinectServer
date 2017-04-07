@@ -36,10 +36,98 @@ void protobuf_AddDesc_ConnectProto_2eproto();
 void protobuf_AssignDesc_ConnectProto_2eproto();
 void protobuf_ShutdownFile_ConnectProto_2eproto();
 
+class pbReqConnect;
 class pbRespConnect;
 class pbRespDevices;
 
 // ===================================================================
+
+class pbReqConnect : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ConnectProto.pbReqConnect) */ {
+ public:
+  pbReqConnect();
+  virtual ~pbReqConnect();
+
+  pbReqConnect(const pbReqConnect& from);
+
+  inline pbReqConnect& operator=(const pbReqConnect& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const pbReqConnect& default_instance();
+
+  void Swap(pbReqConnect* other);
+
+  // implements Message ----------------------------------------------
+
+  inline pbReqConnect* New() const { return New(NULL); }
+
+  pbReqConnect* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const pbReqConnect& from);
+  void MergeFrom(const pbReqConnect& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(pbReqConnect* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional string hostname = 1;
+  void clear_hostname();
+  static const int kHostnameFieldNumber = 1;
+  const ::std::string& hostname() const;
+  void set_hostname(const ::std::string& value);
+  void set_hostname(const char* value);
+  void set_hostname(const char* value, size_t size);
+  ::std::string* mutable_hostname();
+  ::std::string* release_hostname();
+  void set_allocated_hostname(::std::string* hostname);
+
+  // @@protoc_insertion_point(class_scope:ConnectProto.pbReqConnect)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr hostname_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_ConnectProto_2eproto();
+  friend void protobuf_AssignDesc_ConnectProto_2eproto();
+  friend void protobuf_ShutdownFile_ConnectProto_2eproto();
+
+  void InitAsDefaultInstance();
+  static pbReqConnect* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class pbRespConnect : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ConnectProto.pbRespConnect) */ {
  public:
@@ -271,6 +359,54 @@ class pbRespDevices : public ::google::protobuf::Message /* @@protoc_insertion_p
 // ===================================================================
 
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
+// pbReqConnect
+
+// optional string hostname = 1;
+inline void pbReqConnect::clear_hostname() {
+  hostname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& pbReqConnect::hostname() const {
+  // @@protoc_insertion_point(field_get:ConnectProto.pbReqConnect.hostname)
+  return hostname_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void pbReqConnect::set_hostname(const ::std::string& value) {
+  
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:ConnectProto.pbReqConnect.hostname)
+}
+inline void pbReqConnect::set_hostname(const char* value) {
+  
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:ConnectProto.pbReqConnect.hostname)
+}
+inline void pbReqConnect::set_hostname(const char* value, size_t size) {
+  
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:ConnectProto.pbReqConnect.hostname)
+}
+inline ::std::string* pbReqConnect::mutable_hostname() {
+  
+  // @@protoc_insertion_point(field_mutable:ConnectProto.pbReqConnect.hostname)
+  return hostname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* pbReqConnect::release_hostname() {
+  // @@protoc_insertion_point(field_release:ConnectProto.pbReqConnect.hostname)
+  
+  return hostname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void pbReqConnect::set_allocated_hostname(::std::string* hostname) {
+  if (hostname != NULL) {
+    
+  } else {
+    
+  }
+  hostname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), hostname);
+  // @@protoc_insertion_point(field_set_allocated:ConnectProto.pbReqConnect.hostname)
+}
+
+// -------------------------------------------------------------------
+
 // pbRespConnect
 
 // optional int32 resultType = 1;
@@ -510,6 +646,8 @@ inline void pbRespDevices::set_allocated_separator(::std::string* separator) {
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

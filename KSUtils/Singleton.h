@@ -24,7 +24,7 @@ public:
 		return m_self;
 	};
 
-	void ReleaseInstance()
+	static void ReleaseInstance()
 	{
 		if (m_self)
 		{

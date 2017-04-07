@@ -12,6 +12,7 @@
 
 KSSession::KSSession(IKSServicePtr service, socket_ptr sock, std::string guid)
 	: m_StrGuid(guid)
+	, m_bRecvPing(false)
 	, m_KDService(NULL)
 	, m_Service(service)
 	, IKSSession(sock)
@@ -20,8 +21,7 @@ KSSession::KSSession(IKSServicePtr service, socket_ptr sock, std::string guid)
 
 KSSession::~KSSession()
 {
-	//这里不能调用Release,底层AsyncTcpConnection析构时调用
-	//this->Release();
+	this->Release();
 }
 
 void KSSession::RegisterAllService()
@@ -44,7 +44,6 @@ void KSSession::SendShareFrame(ShareFrame frame)
 {
 	ShareData data;
 	m_protocProc.TryPack(frame, data);
-	KSLogService::GetInstance()->OutputMessage("Construct pack success\n");
 	if (NULL != data) this->SendShareData(data);
 }
 
@@ -63,6 +62,10 @@ void KSSession::TryParse(const ShareData& data)
 		case IKSSession::CMD_TYPE_KINECT: {
 			if (m_KDService)
 				m_KDService->DoFrame(frame);
+			break;
+		}
+		case IKSSession::CMD_TYPE_PING: {
+			this->DoPing(frame);
 			break;
 		}
 		default:
@@ -99,6 +102,12 @@ void KSSession::DoFrame(const ShareFrame& frame)
 
 void KSSession::ReqConnect(const ShareFrame& frame)
 {
+	ConnectProto::pbReqConnect reqConn;
+	if (!reqConn.ParseFromArray(frame->m_data, frame->m_u32length))
+		return;
+	m_PeerHostname = reqConn.hostname();
+	KSLogService::GetInstance()->OutputClient(reqConn.hostname(), true);
+
 	ConnectProto::pbRespConnect rConn;
 	std::string tmp("connect success");
 	rConn.set_resulttype(IKSSession::SUCCESS);
@@ -109,11 +118,6 @@ void KSSession::ReqConnect(const ShareFrame& frame)
 		rConn.set_colorport(m_Service->GetColorServerPtr()->GetPort());
 		rConn.set_depthport(m_Service->GetDepthServerPtr()->GetPort());
 		rConn.set_skeleport(m_Service->GetSkeleServerPtr()->GetPort());
-
-		//注册信息到数据服务器
-		m_Service->GetColorServerPtr()->RegisterCmdSock(m_StrGuid, shared_from_this());
-		m_Service->GetDepthServerPtr()->RegisterCmdSock(m_StrGuid, shared_from_this());
-		m_Service->GetSkeleServerPtr()->RegisterCmdSock(m_StrGuid, shared_from_this());
 	}
 	std::string str;
 	rConn.SerializeToString(&str);
@@ -128,10 +132,7 @@ void KSSession::ReqConnect(const ShareFrame& frame)
 
 void KSSession::ReqUnConnect(const ShareFrame& frame)
 {
-	this->ReleaseDataServerSource();
-
-	if (m_Service)
-		m_Service->ReleaseSession(m_StrGuid);
+	this->Release();
 }
 
 void KSSession::ReqDeviceList(const ShareFrame& frame)
@@ -163,18 +164,42 @@ void KSSession::ReqDeviceList(const ShareFrame& frame)
 	this->SendShareFrame(sframe);
 }
 
+void KSSession::DoPing(ShareFrame frame)
+{
+	switch (frame->m_cmdNum & 0xFF)
+	{
+	case IKSSession::CMD_NUM_CLI_PING: {
+		m_bRecvPing = true;
+		frame->m_cmdNum = IKSSession::CMD_NUM_SVR_PING;
+		this->SendShareFrame(frame);
+		KSLogService::GetInstance()->OutputMessage("接收到[套接字保活]协议\n");
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void KSSession::KeepAliveHandler(const boost::system::error_code &err)
+{
+	if (err) return;
+	if (m_bRecvPing)
+	{
+		m_bRecvPing = false;
+		return;
+	}
+
+	this->Release();
+}
+
 void KSSession::Release()
 {
-	this->ReleaseDataServerSource();
+	IKSSession::Release();
 
-	AsyncTcpConnection::Release();
+	KSLogService::GetInstance()->OutputClient(m_PeerHostname, false);
 
 	if (m_Service)
 		m_Service->ReleaseSession(m_StrGuid);
 }
 
-void KSSession::ReleaseDataServerSource()
-{	//删除数据服务器的信息，并释放所有与此控制套接字关联的资源
 
-
-}

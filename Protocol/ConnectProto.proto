@@ -2,6 +2,12 @@ syntax="proto3";
 
 package ConnectProto;
 
+message pbReqConnect
+{
+    string hostname = 1;    
+}
+
+
 // 服务器对客户端的请求连接进行回应
 message pbRespConnect
 {

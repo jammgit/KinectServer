@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GuidProcessUtil.cpp" />
+    <ClCompile Include="NetworkMonitor.cpp" />
     <ClCompile Include="ProtocProcess.cpp" />
     <ClCompile Include="ShareData.cpp" />
     <ClCompile Include="ShareFrame.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="AsyncTcpServer.h" />
     <ClInclude Include="CharsetUtils.h" />
     <ClInclude Include="GuidProcessUtil.h" />
+    <ClInclude Include="NetworkMonitor.h" />
     <ClInclude Include="PortsMacro.h" />
     <ClInclude Include="ProtocProcess.h" />
     <ClInclude Include="ShareData.h" />

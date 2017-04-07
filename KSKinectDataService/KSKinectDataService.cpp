@@ -46,12 +46,13 @@ void KSKinectDataService::DoFrame(const ShareFrame& frame)
 
 void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 {//获取设备并回复状态
-	if (!m_StateMachine->IsClientCanReqStart())
-		return;
 
 	KinectDataProto::pbReqStart start;
  	if (start.ParseFromArray(frame->m_data, frame->m_u32length))
 	{
+		if (!m_StateMachine->IsClientCanReqStart(start.devicename()))
+			return;
+
 		std::string name = start.devicename();
 		std::wstring wname;
 		CharsetUtils::ANSIStringToUnicodeString(name, wname);
@@ -94,11 +95,14 @@ void KSKinectDataService::ProcessStartReq(const ShareFrame& frame)
 
 void KSKinectDataService::ProcessEndReq(const ShareFrame& frame)
 {//客户端请求停止发送数据
-	if (!m_StateMachine->IsClientCanReqEnd())
-		return;
+
+
 	KinectDataProto::pbReqEnd end;
 	if (end.ParseFromArray(frame->m_data, frame->m_u32length))
 	{
+		if (!m_StateMachine->IsClientCanReqEnd(end.devicename()))
+			return;
+
 		m_Service->GetColorServerPtr()->UnRegisterDataSock(
 			m_Session->StrGuid(), end.devicename());
 		m_Service->GetDepthServerPtr()->UnRegisterDataSock(
@@ -110,6 +114,8 @@ void KSKinectDataService::ProcessEndReq(const ShareFrame& frame)
 
 void KSKinectDataService::SendEnd(eSvrEndType type, const std::string& devname)
 {//主动停止发送
+	if (!m_StateMachine->IsServerCanReqEnd(devname))
+		return;
 
 	m_Service->GetColorServerPtr()->UnRegisterDataSock(
 		m_Session->StrGuid(), devname);
@@ -118,8 +124,6 @@ void KSKinectDataService::SendEnd(eSvrEndType type, const std::string& devname)
 	m_Service->GetSkeleServerPtr()->UnRegisterDataSock(
 		m_Session->StrGuid(), devname);
 
-	if (!m_StateMachine->IsServerCanReqEnd())
-		return;
 	KinectDataProto::pbEndTransfer end;
 	end.set_devicename(devname);
 	end.set_type(type);

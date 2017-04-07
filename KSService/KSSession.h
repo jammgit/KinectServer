@@ -20,25 +20,25 @@ public:
 	void RegisterAllService() override;
 	IKSKinectDataServicePtr KinectDataService() override;
 	std::string StrGuid() override;
+	void DoFrame(const ShareFrame& frame) override;
 
 	void SendShareFrame(ShareFrame frame) override;
-
-//protected:
+	
+protected:
 	void TryParse(const ShareData& data) override;
-	void DoFrame(const ShareFrame& frame) override;
+	void KeepAliveHandler(const boost::system::error_code &) override;
 	void Release() override;
 
 protected:
 	inline void ReqConnect(const ShareFrame& frame);
 	inline void ReqUnConnect(const ShareFrame& frame);
 	inline void ReqDeviceList(const ShareFrame& frame);
-
-protected:
-	inline void ReleaseDataServerSource();
+	inline void DoPing(ShareFrame frame);
 
 private:
+	std::string m_PeerHostname;
 	std::string m_StrGuid;
-
+	bool m_bRecvPing;
 	ProtocProcess m_protocProc;
 
 	IKSKinectDataServicePtr m_KDService;

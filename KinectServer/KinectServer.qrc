@@ -7,5 +7,12 @@
         <file>Resources/close.png</file>
         <file>Resources/close_2.png</file>
         <file>Resources/icon.png</file>
+        <file>Resources/minimize.png</file>
+        <file>Resources/maxmize.png</file>
+        <file>Resources/good_signal.png</file>
+        <file>Resources/high_signal.png</file>
+        <file>Resources/low_signal.png</file>
+        <file>Resources/middle_signal.png</file>
+        <file>Resources/no_signal.png</file>
     </qresource>
 </RCC>

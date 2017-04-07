@@ -58,7 +58,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>..\lib\protobuf\debug\;..\lib\libyuv\;..\lib\kinect\x86\;..\lib\boost\debug\;$(QTDIR)\lib;$(SolutionDir)$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;KSLogService.lib;KSKinectDataService.lib;KSService.lib;KSUtils.lib;Ole32.lib;IKSKinectDataCapture.lib;IKSKinectH264Encode.lib;KSKinectDataServer.lib;Kinect10.lib;yuvd.lib;libprotobufd.lib;boost_system-vc140-mt-gd-1_62.lib;boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;KSLogService.lib;KSKinectDataService.lib;KSService.lib;KSUtils.lib;Ole32.lib;Wlanapi.lib;Iphlpapi.lib;IKSKinectDataCapture.lib;IKSKinectH264Encode.lib;KSKinectDataServer.lib;Kinect10.lib;yuvd.lib;libprotobufd.lib;boost_system-vc140-mt-gd-1_62.lib;boost_chrono-vc140-mt-gd-1_62.lib;boost_date_time-vc140-mt-gd-1_62.lib;boost_regex-vc140-mt-gd-1_62.lib;boost_thread-vc140-mt-gd-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
@@ -92,7 +92,7 @@ Xcopy /s/y $(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe ..\Buil
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>..\lib\protobuf\release\;..\lib\libyuv\;..\lib\kinect\x86\;..\lib\boost\release\;$(QTDIR)\lib;$(SolutionDir)$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;KSLogService.lib;KSKinectDataService.lib;KSUtils.lib;KSService.lib;IKSKinectDataCapture.lib;IKSKinectH264Encode.lib;KSKinectDataServer.lib;Ole32.lib;Kinect10.lib;yuv.lib;libprotobuf.lib;boost_chrono-vc140-mt-1_62.lib;boost_date_time-vc140-mt-1_62.lib;boost_regex-vc140-mt-1_62.lib;boost_system-vc140-mt-1_62.lib;boost_thread-vc140-mt-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;KSLogService.lib;KSKinectDataService.lib;KSUtils.lib;KSService.lib;IKSKinectDataCapture.lib;IKSKinectH264Encode.lib;KSKinectDataServer.lib;Ole32.lib;Wlanapi.lib;Iphlpapi.lib;Kinect10.lib;yuv.lib;libprotobuf.lib;boost_chrono-vc140-mt-1_62.lib;boost_date_time-vc140-mt-1_62.lib;boost_regex-vc140-mt-1_62.lib;boost_system-vc140-mt-1_62.lib;boost_thread-vc140-mt-1_62.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>Xcopy /s/y ..\bin\boost\release $(SolutionDir)$(Platform)\$(Configuration)

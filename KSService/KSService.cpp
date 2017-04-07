@@ -29,7 +29,16 @@ void KSService::WorkingFunc()
 
 void KSService::Stop()
 {
+	// 结束服务线程
 	IKSService::Stop();
+	// 结束数据服务器
+	m_ColorServerPtr->Stop();
+	m_DepthServerPtr->Stop();
+	m_SkeletonServerPtr->Stop();
+	
+	// 删除服务器的信息
+
+	// 删除回话信息
 
 	std::lock_guard<std::mutex> lock(m_MapMutex);
 	m_SessionMap.clear();
@@ -53,14 +62,11 @@ void KSService::CreateConnection(socket_ptr sock)
 		m_DepthServerPtr->RegisterCmdSock(guid, session);
 		m_SkeletonServerPtr->RegisterCmdSock(guid, session);
 
-		KSLogService::GetInstance()->OutputMessage("Create Connection\n");
-		KSLogService::GetInstance()->OutputClient(
-			session->GetAddrStr().c_str(), true);
 		return;
 	}
 	else
 	{
-		KSLogService::GetInstance()->OutputMessage("Create Connection fail\n");
+		
 	}
 }
 
@@ -70,10 +76,6 @@ void KSService::ReleaseSession(const std::string& guid)
 	auto iter = m_SessionMap.find(guid);
 	if (iter != m_SessionMap.end())
 	{
-
-		KSLogService::GetInstance()->OutputClient(
-			iter->second->GetAddrStr().c_str(), false);
-
 		m_SessionMap.erase(iter);
 
 		m_ColorServerPtr->UnregisterCmdSock(guid);
