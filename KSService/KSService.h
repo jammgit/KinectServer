@@ -22,7 +22,7 @@ typedef std::map<StrGUID, KSSessionPtr> KSSessionMap;
 
 class KSService
 	: public IKSService
-	, public Singleton<KSService>
+	//, public Singleton<KSService>
 {
 public:
 	KSService();

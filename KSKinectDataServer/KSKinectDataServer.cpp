@@ -59,6 +59,12 @@ bool KSKinectDataServer::UnregisterCmdSock(
 		auto iter = m_Guid2DataSockMap.find(guid);
 		if (iter != m_Guid2DataSockMap.end())
 		{
+			auto iter_2 = iter->second.begin();
+			while (iter_2 != iter->second.end())
+			{
+				iter_2->second->Close();
+				++iter_2;
+			}
 			iter->second.clear();
 			m_Guid2DataSockMap.erase(iter);
 		}

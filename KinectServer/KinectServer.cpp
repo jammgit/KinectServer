@@ -17,10 +17,11 @@
 #include <QPen>
 #include <QSplitter>
 #include <QPropertyAnimation>
+#include <boost\make_shared.hpp>
 
 KinectServer::KinectServer(QWidget *parent)
 	: QMainWindow(parent)
-	, m_ServicePtr(KSService::GetInstance())
+	, m_ServicePtr(boost::make_shared<KSService>())
 	, m_SysTray(this)
 	// m_ServicePtr是第一个shared_ptr，保证服务在start时share_from_this不出错
 {
@@ -37,7 +38,7 @@ KinectServer::KinectServer(QWidget *parent)
 	SysConfig::InitConfig();
 	KSLogService::GetInstance()->RegisterClient(this);
 	//m_ServicePtr->RegisterClient(this);
-	m_ServicePtr->Start();
+	//m_ServicePtr->Start();
 }
 
 KinectServer::~KinectServer()
@@ -324,6 +325,7 @@ void KinectServer::slot_NetworkInfo(double quality, std::string ssid, std::strin
 		ui.label_2->setText("No signal");
 		lastip = "";
 		ui.lineEdit->setText("0000 0000 0000");
+		m_ServicePtr->Stop();
 		return;
 	}
 	else if (quality < 0.25)
@@ -346,6 +348,8 @@ void KinectServer::slot_NetworkInfo(double quality, std::string ssid, std::strin
 
 	if (lastip != ip)
 	{
+		//m_ServicePtr->Stop();
+		m_ServicePtr->Start();
 		unsigned long uip = inet_addr(ip.c_str());
 		QString fip = QString::number(htonl(uip), 16);
 		QString fport = QString::number(htons(PORT_KSSERVICE), 16);

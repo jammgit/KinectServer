@@ -192,11 +192,18 @@ void KSSession::KeepAliveHandler(const boost::system::error_code &err)
 	this->Release();
 }
 
-void KSSession::Release()
+void KSSession::Close()
 {
+	m_KDService = NULL;
+
 	IKSSession::Release();
 
 	KSLogService::GetInstance()->OutputClient(m_PeerHostname, false);
+}
+
+void KSSession::Release()
+{
+	this->Close();
 
 	if (m_Service)
 		m_Service->ReleaseSession(m_StrGuid);

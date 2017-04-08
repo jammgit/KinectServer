@@ -21,6 +21,7 @@ public:
 	IKSKinectDataServicePtr KinectDataService() override;
 	std::string StrGuid() override;
 	void DoFrame(const ShareFrame& frame) override;
+	void Close() override;
 
 	void SendShareFrame(ShareFrame frame) override;
 	

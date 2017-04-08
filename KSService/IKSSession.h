@@ -46,6 +46,7 @@ public:
 	virtual IKSKinectDataServicePtr KinectDataService() = 0;
 	virtual std::string StrGuid() = 0;
 	virtual void DoFrame(const ShareFrame& frame) = 0;
+	virtual void Close() = 0;
 
 	virtual void SendShareFrame(ShareFrame frame) = 0;
 

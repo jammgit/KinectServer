@@ -11,6 +11,7 @@ KSService::KSService()
 	, m_DepthServerPtr(NULL)
 	, m_SkeletonServerPtr(NULL)
 {
+	
 }
 
 KSService::~KSService()
@@ -20,7 +21,12 @@ KSService::~KSService()
 
 void KSService::WorkingFunc()
 {
-	KinectDataCapturer::GetInstance()->RegisterDevStatusCallBack();
+	static bool first = true;
+	if (first)
+	{
+		KinectDataCapturer::GetInstance()->RegisterDevStatusCallBack();
+		first = false;
+	}
 	if (!m_ColorServerPtr) { m_ColorServerPtr = boost::make_shared<KSKinectDataServer>(PORT_COLORDATA); m_ColorServerPtr->Thread::Start(); }
 	if (!m_DepthServerPtr) { m_DepthServerPtr = boost::make_shared<KSKinectDataServer>(PORT_DEPTHDATA); m_DepthServerPtr->Thread::Start(); }
 	if (!m_SkeletonServerPtr) { m_SkeletonServerPtr = boost::make_shared<KSKinectDataServer>(PORT_SKELETONDATA); m_SkeletonServerPtr->Thread::Start(); }
@@ -31,17 +37,28 @@ void KSService::Stop()
 {
 	// 结束服务线程
 	IKSService::Stop();
-	// 结束数据服务器
-	m_ColorServerPtr->Stop();
-	m_DepthServerPtr->Stop();
-	m_SkeletonServerPtr->Stop();
-	
+
 	// 删除服务器的信息
-
-	// 删除回话信息
-
 	std::lock_guard<std::mutex> lock(m_MapMutex);
-	m_SessionMap.clear();
+	auto iter = m_SessionMap.begin();
+	while (iter != m_SessionMap.end())
+	{
+		m_ColorServerPtr->UnregisterCmdSock(iter->first);
+		m_DepthServerPtr->UnregisterCmdSock(iter->first);
+		m_SkeletonServerPtr->UnregisterCmdSock(iter->first);
+
+		iter->second->Close();
+		m_SessionMap.erase(iter++);
+	}
+
+	// 结束数据服务器
+	if (m_ColorServerPtr) { m_ColorServerPtr->Stop(); m_ColorServerPtr = NULL; }
+	if (m_DepthServerPtr) { m_DepthServerPtr->Stop(); m_DepthServerPtr = NULL; }
+	if (m_SkeletonServerPtr) { m_SkeletonServerPtr->Stop(); m_SkeletonServerPtr = NULL; }
+	
+	// 删除回话信息
+	//std::lock_guard<std::mutex> lock_1(m_MapMutex);
+	//m_SessionMap.clear();
 }
 
 void KSService::CreateConnection(socket_ptr sock)
