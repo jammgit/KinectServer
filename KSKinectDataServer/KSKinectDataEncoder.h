@@ -6,9 +6,6 @@
 #include <boost\shared_ptr.hpp>
 #include <mutex>
 
-//class AsyncTcpConnection;
-//typedef boost::shared_ptr<AsyncTcpConnection> AsyncTcpConnectionPtr;
-
 class KSKinectDataSender;
 typedef boost::shared_ptr<KSKinectDataSender> KSKinectDataSenderPtr;
 

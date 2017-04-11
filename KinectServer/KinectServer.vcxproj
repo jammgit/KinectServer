@@ -63,7 +63,7 @@
     </Link>
     <PostBuildEvent>
       <Command>Xcopy /s/y ..\bin\boost\debug $(SolutionDir)$(Platform)\$(Configuration)
-Xcopy /s/y ..\Runtime\Debug\Qt5* $(SolutionDir)$(Platform)\$(Configuration)
+Xcopy /s/y ..\Runtime\Debug $(SolutionDir)$(Platform)\$(Configuration)
 Xcopy ..\Runtime\Common\Kinect10.dll $(SolutionDir)$(Platform)\$(Configuration)
 
 rd /s/q ..\Build 
@@ -96,7 +96,7 @@ Xcopy /s/y $(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe ..\Buil
     </Link>
     <PostBuildEvent>
       <Command>Xcopy /s/y ..\bin\boost\release $(SolutionDir)$(Platform)\$(Configuration)
-Xcopy /s/y ..\Runtime\Release\Qt5* $(SolutionDir)$(Platform)\$(Configuration)
+Xcopy /s/y ..\Runtime\Release $(SolutionDir)$(Platform)\$(Configuration)
 Xcopy ..\Runtime\Common\Kinect10.dll $(SolutionDir)$(Platform)\$(Configuration)
 
 rd /s/q ..\Build 

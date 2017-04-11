@@ -38,7 +38,8 @@ KinectServer::KinectServer(QWidget *parent)
 	SysConfig::InitConfig();
 	KSLogService::GetInstance()->RegisterClient(this);
 	//m_ServicePtr->RegisterClient(this);
-	//m_ServicePtr->Start();
+	m_ServicePtr->Start();
+	ui.lineEdit->setText(QString::number(PORT_KSSERVICE, 10));
 }
 
 KinectServer::~KinectServer()
@@ -325,7 +326,7 @@ void KinectServer::slot_NetworkInfo(double quality, std::string ssid, std::strin
 		ui.label_2->setText("No signal");
 		lastip = "";
 		ui.lineEdit->setText("0000 0000 0000");
-		m_ServicePtr->Stop();
+		//m_ServicePtr->Stop();
 		return;
 	}
 	else if (quality < 0.25)
@@ -349,14 +350,14 @@ void KinectServer::slot_NetworkInfo(double quality, std::string ssid, std::strin
 	if (lastip != ip)
 	{
 		//m_ServicePtr->Stop();
-		m_ServicePtr->Start();
+		//m_ServicePtr->Start();
 		unsigned long uip = inet_addr(ip.c_str());
 		QString fip = QString::number(htonl(uip), 16);
 		QString fport = QString::number(htons(PORT_KSSERVICE), 16);
 		fip.insert(4, " ");
 		fip.append(" ");
 		fip.append(fport);
-		ui.lineEdit->setText(fip.toUpper());
+		//ui.lineEdit->setText(fip.toUpper());
 		lastip = ip;
 	}
 }

@@ -30,7 +30,7 @@ protected:
 		socket_ptr sockPtr,
 		const boost::system::error_code &err);
 
-public://模板不支持protected属性的继承，应是protected成员
+
 	virtual void CreateConnection(socket_ptr sock) = 0;
 	virtual void Release();
 

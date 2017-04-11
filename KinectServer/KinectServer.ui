@@ -372,7 +372,7 @@ background:transparent;</string>
      <string/>
     </property>
     <property name="text">
-     <string>a6a465456</string>
+     <string/>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -401,7 +401,7 @@ background:transparent;</string>
      <string notr="true"/>
     </property>
     <property name="text">
-     <string>请在客户端输入显示的PIN码进行连接</string>
+     <string>端口号</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -427,7 +427,7 @@ background:transparent;</string>
 </string>
     </property>
     <property name="text">
-     <string>Copyright © 2017 Gdut 602. All rights reserved. </string>
+     <string>Copyright © 2017 Gdut. All rights reserved. </string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>

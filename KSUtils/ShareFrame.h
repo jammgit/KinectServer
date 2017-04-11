@@ -20,7 +20,7 @@ public:
 	static ShareFrame Make(
 		const std::string& data,
 		const unsigned char& type,
-		const unsigned char& num,
+		const unsigned char& num, 
 		const unsigned char& ver,
 		const unsigned int& seq);
 
